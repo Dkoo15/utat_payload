@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.0.2)
+project("UTAT UAV")
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules/")
+FIND_PACKAGE(OpenCV REQUIRED)
+FIND_PACKAGE(glib REQUIRED)
+FIND_PACKAGE(aravis REQUIRED)
+include_directories(${glib_INCLUDE_DIR})
+include_directories(${aravis_INCLUDE_DIR})
+include_directories(${OpenCV_INCLUDE_DIRS})
+add_subdirectory(main)
+add_subdirectory(camera)
+add_subdirectory(imgproc)
