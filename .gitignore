@@ -4,6 +4,7 @@
 *.o
 *.dirstamp
 *.a
+*.swp
 camera/.deps/
 main/.deps/
 camera/CMakeFiles/
