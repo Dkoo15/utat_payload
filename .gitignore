@@ -1,0 +1,16 @@
+*.cmake
+*.make
+*.internal
+*.o
+*.dirstamp
+*.a
+camera/.deps/
+main/.deps/
+camera/CMakeFiles/
+imgproc/CMakeFiles/
+main/Makefile
+main/CmakeFiles/
+Cmakefiles/
+install_manifest.txt
+CMakeCache.txt
+Makefile
