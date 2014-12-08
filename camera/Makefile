@@ -144,25 +144,25 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-camera/CMakeFiles/teledyne.dir/rule:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f CMakeFiles/Makefile2 camera/CMakeFiles/teledyne.dir/rule
-.PHONY : camera/CMakeFiles/teledyne.dir/rule
+camera/CMakeFiles/uavcam.dir/rule:
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f CMakeFiles/Makefile2 camera/CMakeFiles/uavcam.dir/rule
+.PHONY : camera/CMakeFiles/uavcam.dir/rule
 
 # Convenience name for target.
-teledyne: camera/CMakeFiles/teledyne.dir/rule
-.PHONY : teledyne
+uavcam: camera/CMakeFiles/uavcam.dir/rule
+.PHONY : uavcam
 
 # fast build rule for target.
-teledyne/fast:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/teledyne.dir/build.make camera/CMakeFiles/teledyne.dir/build
-.PHONY : teledyne/fast
+uavcam/fast:
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/build
+.PHONY : uavcam/fast
 
 arvteledyne.o: arvteledyne.cpp.o
 .PHONY : arvteledyne.o
 
 # target to build an object file
 arvteledyne.cpp.o:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/teledyne.dir/build.make camera/CMakeFiles/teledyne.dir/arvteledyne.cpp.o
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/arvteledyne.cpp.o
 .PHONY : arvteledyne.cpp.o
 
 arvteledyne.i: arvteledyne.cpp.i
@@ -170,7 +170,7 @@ arvteledyne.i: arvteledyne.cpp.i
 
 # target to preprocess a source file
 arvteledyne.cpp.i:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/teledyne.dir/build.make camera/CMakeFiles/teledyne.dir/arvteledyne.cpp.i
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/arvteledyne.cpp.i
 .PHONY : arvteledyne.cpp.i
 
 arvteledyne.s: arvteledyne.cpp.s
@@ -178,8 +178,32 @@ arvteledyne.s: arvteledyne.cpp.s
 
 # target to generate assembly for a file
 arvteledyne.cpp.s:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/teledyne.dir/build.make camera/CMakeFiles/teledyne.dir/arvteledyne.cpp.s
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/arvteledyne.cpp.s
 .PHONY : arvteledyne.cpp.s
+
+fakecamera.o: fakecamera.cpp.o
+.PHONY : fakecamera.o
+
+# target to build an object file
+fakecamera.cpp.o:
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/fakecamera.cpp.o
+.PHONY : fakecamera.cpp.o
+
+fakecamera.i: fakecamera.cpp.i
+.PHONY : fakecamera.i
+
+# target to preprocess a source file
+fakecamera.cpp.i:
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/fakecamera.cpp.i
+.PHONY : fakecamera.cpp.i
+
+fakecamera.s: fakecamera.cpp.s
+.PHONY : fakecamera.s
+
+# target to generate assembly for a file
+fakecamera.cpp.s:
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/fakecamera.cpp.s
+.PHONY : fakecamera.cpp.s
 
 # Help Target
 help:
@@ -193,10 +217,13 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... teledyne"
+	@echo "... uavcam"
 	@echo "... arvteledyne.o"
 	@echo "... arvteledyne.i"
 	@echo "... arvteledyne.s"
+	@echo "... fakecamera.o"
+	@echo "... fakecamera.i"
+	@echo "... fakecamera.s"
 .PHONY : help
 
 

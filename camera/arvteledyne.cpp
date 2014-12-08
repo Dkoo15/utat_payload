@@ -1,19 +1,24 @@
 #include "arvteledyne.h"
 
 Teledyne::Teledyne(){
-	imgheight = 3072;
-	imgwidth = 4096;
+	buffer = NULL;
 }
 
 Teledyne:: ~Teledyne(){
+	if(buffer) delete buffer;
 }
 
 int Teledyne::initCamSetting(){
-return 0;
+	return 0;
 }
 
+int Teledyne::sendTrigger(){
+	return 0;
+}
+
+
 char* Teledyne::getBuffer(){
-return 0;
+	return 0;
 }
 
 

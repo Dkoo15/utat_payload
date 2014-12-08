@@ -1,1 +1,1 @@
-add_library(teledyne arvteledyne.cpp)
+add_library(uavcam arvteledyne.cpp fakecamera.cpp)

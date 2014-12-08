@@ -1,19 +1,16 @@
-extern "C"{
-#include <arv.h>
-}
 #include "uavcamera.h"
+#include <stdio.h>
 
-class Teledyne: public Uavcam {
+class Imgfromfile: public Uavcam {
 
 	public: 
-		Teledyne();
-		~Teledyne();	
+		Imgfromfile();
+		~Imgfromfile();	
 		
 		int initCamSetting();
 		int sendTrigger();
 		char* getBuffer();
 
 	private:
-		ArvGc *genicam;
-
+		int i, n;
 };

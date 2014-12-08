@@ -2,15 +2,30 @@
 
 //Libraries
 #include "arvteledyne.h" 
+#include "fakecamera.h"
 #include "uavcv.h"
 
 int main(){
-Teledyne* TSC4096 = new Teledyne();
-compVision* ip = new compVision;
-printf("Made Camera with H=%d, W =%d \n", TSC4096->imgheight, TSC4096->imgwidth);
-ip->showImage();
+	Uavcam *camera  = new Imgfromfile();
+	char* imgbuf;
+	compVision* ip = new compVision;
+	char input;
+	
+	
+	camera->initCamSetting();
+	printf("Start camera loop?\n");
+	input = getchar();
+	while(input != 'x'){
+		
+		camera->sendTrigger();
+		imgbuf = camera->getBuffer();
+		ip->processRaw(imgbuf);
+		ip->showImage();
+		printf("Press x to close\n");
+		input = getchar();
+	}
 
-waitKey(0);
-delete TSC4096;
-return 0;
+	delete camera;
+	delete ip;
+	return 0;
 }
