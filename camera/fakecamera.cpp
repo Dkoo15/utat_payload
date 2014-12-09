@@ -10,7 +10,7 @@ Imgfromfile:: ~Imgfromfile(){
 
 int Imgfromfile::initCamSetting(){
 	bufsize = 12582912;
-	buffer = new char[bufsize];
+	buffer = new unsigned char[bufsize];
 	i = 0;
 	n = 5;
 	return 0;
@@ -22,7 +22,7 @@ int Imgfromfile::sendTrigger(){
 }
 
 
-char* Imgfromfile::getBuffer(){
+unsigned char* Imgfromfile::getBuffer(){
 	FILE* pFile;
 	char filename[150];
 	size_t result;

@@ -11,7 +11,7 @@ class Teledyne: public Uavcam {
 		
 		int initCamSetting();
 		int sendTrigger();
-		char* getBuffer();
+		unsigned char* getBuffer();
 
 	private:
 		ArvGc *genicam;

@@ -9,7 +9,7 @@ class Imgfromfile: public Uavcam {
 		
 		int initCamSetting();
 		int sendTrigger();
-		char* getBuffer();
+	  	unsigned char* getBuffer();
 
 	private:
 		int i, n;

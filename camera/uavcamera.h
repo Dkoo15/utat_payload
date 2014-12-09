@@ -10,7 +10,7 @@ class Uavcam {
 		
 		virtual int initCamSetting() = 0;
 		virtual int sendTrigger() = 0;
-		virtual char* getBuffer() = 0;
+		virtual unsigned char* getBuffer() = 0;
 	protected:
-		char* buffer;
+		unsigned char* buffer;
 };

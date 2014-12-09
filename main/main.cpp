@@ -7,7 +7,7 @@
 
 int main(){
 	Uavcam *camera  = new Imgfromfile();
-	char* imgbuf;
+	unsigned char* imgbuf;
 	compVision* ip = new compVision;
 	char input;
 	
@@ -15,15 +15,15 @@ int main(){
 	camera->initCamSetting();
 	printf("Start camera loop?\n");
 	input = getchar();
-	while(input != 'x'){
+//	while(input != 'x'){
 		
 		camera->sendTrigger();
 		imgbuf = camera->getBuffer();
 		ip->processRaw(imgbuf);
 		ip->showImage();
-		printf("Press x to close\n");
-		input = getchar();
-	}
+//		printf("Press x to close\n");
+//		input = getchar();
+//	}
 
 	delete camera;
 	delete ip;

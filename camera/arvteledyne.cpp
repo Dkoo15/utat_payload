@@ -17,7 +17,7 @@ int Teledyne::sendTrigger(){
 }
 
 
-char* Teledyne::getBuffer(){
+unsigned char* Teledyne::getBuffer(){
 	return 0;
 }
 
