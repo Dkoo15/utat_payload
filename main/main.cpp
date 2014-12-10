@@ -9,6 +9,7 @@ int main(){
 	Uavcam *camera  = new Imgfromfile();
 	unsigned char* imgbuf;
 	compVision* ip = new compVision;
+	vector<unsigned char> jpgbuffer;
 	char input;
 	
 	
@@ -21,6 +22,8 @@ int main(){
 		imgbuf = camera->getBuffer();
 		ip->processRaw(imgbuf);
 		ip->showImage();
+		ip->saveFullImage(0);
+		jpgbuffer = ip->compressPreview();
 //		printf("Press x to close\n");
 //		input = getchar();
 //	}

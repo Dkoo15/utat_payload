@@ -7,7 +7,6 @@
 compVision:: compVision(){
 	jpg_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 	jpg_params.push_back(JPEG_QUAL);
-
 }
 
 compVision:: ~compVision(){
@@ -16,6 +15,8 @@ compVision:: ~compVision(){
 }
 
 void compVision::showImage(){
+	if (!SHOWIMAGE) return;
+
 	namedWindow("Image Preview", WINDOW_AUTOSIZE);
 	imshow("Image Preview",preview);
 	waitKey(0);
@@ -54,6 +55,7 @@ int compVision::saveFullImage(int n){
 	const char* dir = DIRECTORY;
 	
 	if (!rgb.data) return -1;
+	if (!SAVEIMAGE) return -1;
 
 	clock_t strt;
 	double elapsed;
