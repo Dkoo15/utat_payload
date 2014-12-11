@@ -5,7 +5,7 @@
 #define IMGWIDTH 4096
 #define IMGSIZE 12582912
 #define DOWNSIZE 0.125
-#define JPEG_QUAL 80
+#define JPEG_QUAL 90
 #define DIRECTORY "save/"
 #define SHOWIMAGE true
 #define STEAMIMAGE true

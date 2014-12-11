@@ -24,10 +24,11 @@ int main(){
 		ip->showImage();
 		ip->saveFullImage(0);
 		jpgbuffer = ip->compressPreview();
+		printf("Size of compress preview jpg %d", jpgbuffer.size());
 //		printf("Press x to close\n");
 //		input = getchar();
 //	}
-
+	jpgbuffer.clear();
 	delete camera;
 	delete ip;
 	return 0;
