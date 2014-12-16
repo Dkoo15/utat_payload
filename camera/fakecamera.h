@@ -8,9 +8,10 @@ class Imgfromfile: public Uavcam {
 		~Imgfromfile();	
 		
 		int initCamSetting();
-		int sendTrigger();
+		void startCam();
+		void sendTrigger();
 	  	unsigned char* getBuffer();
-
+		void endCam();
 	private:
 		int i, n;
 };

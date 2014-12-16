@@ -16,9 +16,12 @@ int Imgfromfile::initCamSetting(){
 	return 0;
 }
 
-int Imgfromfile::sendTrigger(){
+void Imgfromfile::startCam(){
+	printf("Reading pictures from the saved buffers \n");
+}
+
+void Imgfromfile::sendTrigger(){
 	printf("Fake trigger\n");
-	return 0;
 }
 
 
@@ -46,5 +49,6 @@ unsigned char* Imgfromfile::getBuffer(){
 	return buffer;
 }
 
-
-
+void Imgfromfile::endCam(){
+	printf("Fake end \n");
+}

@@ -4,6 +4,7 @@
 #include "arvteledyne.h" 
 #include "fakecamera.h"
 #include "uavcv.h"
+#include "uavimage.h"
 
 int main(){
 	Uavcam *camera  = new Imgfromfile();
@@ -15,6 +16,7 @@ int main(){
 	
 	camera->initCamSetting();
 	printf("Start camera loop?\n");
+	camera->startCam();
 	input = getchar();
 //	while(input != 'x'){
 		
@@ -24,10 +26,11 @@ int main(){
 		ip->showImage();
 		ip->saveFullImage(0);
 		jpgbuffer = ip->compressPreview();
-		printf("Size of compress preview jpg %d", jpgbuffer.size());
+		printf("Size of compress preview jpg %lu", jpgbuffer.size());
 //		printf("Press x to close\n");
 //		input = getchar();
 //	}
+	camera->endCam();
 	jpgbuffer.clear();
 	delete camera;
 	delete ip;
