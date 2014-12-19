@@ -13,6 +13,7 @@ class Uavcam {
 		virtual void sendTrigger() = 0;
 		virtual unsigned char* getBuffer() = 0;
 		virtual void endCam() = 0;
+
 	protected:
 		unsigned char* buffer;
 };

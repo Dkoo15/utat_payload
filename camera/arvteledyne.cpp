@@ -119,7 +119,7 @@ void Teledyne::endCam(){
 void Teledyne::parseInputs(char commands[][100], int *num){
 	*num = 0;
 	FILE* configFile;
-	configFile = fopen("teledyne.config", "r");
+	configFile = fopen("teledyne.cfg", "r");
 
 	if(configFile == NULL) return;
 

@@ -8,6 +8,7 @@ include_directories(../imgproc/)
 target_link_libraries(uavPayload uavcam)
 target_link_libraries(uavPayload imageproc)
 target_link_libraries(uavPayload ${OpenCV_LIBS})
-target_link_libraries(uavPayload ${glib_LIBRARY})
+target_link_libraries(uavPayload ${GLIB_LIBRARIES})
+target_link_libraries(uavPayload ${GOBJECT_LIBRARIES})
 target_link_libraries(uavPayload ${aravis_LIBRARY})
 

@@ -1,5 +1,5 @@
-*.cmake
 *.make
+cmake_install*
 *.internal
 *.o
 *.dirstamp

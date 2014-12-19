@@ -1,5 +1,9 @@
 #include <stdio.h>
 
+extern "C"{
+#include <arv.h>
+}
+
 //Libraries
 #include "arvteledyne.h" 
 #include "fakecamera.h"
@@ -7,14 +11,26 @@
 #include "uavimage.h"
 
 int main(){
-	Uavcam *camera  = new Imgfromfile();
+//	Uavcam *camera  = new Imgfromfile();
+	Teledyne *camera = new Teledyne(); 
 	unsigned char* imgbuf;
 	compVision* ip = new compVision;
 	vector<unsigned char> jpgbuffer;
 	char input;
+
+	char *val, *set;
+	char commands[25][100];
+	int n;
+
+	camera->parseInputs(commands,&n);
+
+	for (int i = 0; i < n; i++){
+		set = strtok(commands[i],"=");
+		val = strtok(NULL,"=");
+		printf("Feature = %s  |||| Value = %s", set,val);
+	}	
 	
-	
-	camera->initCamSetting();
+/*	camera->initCamSetting();
 	printf("Start camera loop?\n");
 	camera->startCam();
 	input = getchar();
@@ -32,7 +48,9 @@ int main(){
 //	}
 	camera->endCam();
 	jpgbuffer.clear();
-	delete camera;
+
+
+	delete camera;a*/
 	delete ip;
 	return 0;
 }
