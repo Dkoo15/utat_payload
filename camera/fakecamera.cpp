@@ -13,7 +13,7 @@ int Imgfromfile::initCamSetting(){
 	buffer = new unsigned char[bufsize];
 	i = 0;
 	n = 5;
-	return 0;
+	return 1;
 }
 
 void Imgfromfile::startCam(){

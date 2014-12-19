@@ -17,12 +17,12 @@ int Teledyne::initCamSetting(){
 	gint payload;
 
 //  Initial Setup - Find the Camera	
-	printf("Looking for the Camera...");
+	printf("Looking for the Camera...\n");
 	device = arv_open_device(NULL);
 
 	if(device == NULL) {
-		printf("No camera found!");
-		return -1;	
+		printf("No camera found!\n");
+		return 0;	
 	}
 	printf("Found %s \n", arv_get_device_id(0));
 	genicam = arv_device_get_genicam(device);
@@ -30,8 +30,8 @@ int Teledyne::initCamSetting(){
 // Parse inputs from a configuration file
 	parseInputs(commands,&n);
 	if (n == 0) {
-		printf("No features found, can't take proper pictures");
-		return -1;
+		printf("No features found, can't take proper pictures\n");
+		return 0;
 	}
 
 //Apply setting and display to confirm
@@ -80,13 +80,13 @@ int Teledyne::initCamSetting(){
 	//Get and save the node that is the software trigger
 	trigger = arv_gc_get_node(genicam,"TriggerSoftware");
 
-	return 0;
+	return 1;
 }
 
 void Teledyne::startCam(){
 	ArvGcNode *start = arv_gc_get_node(genicam, "AcquisitionStart");
 	arv_gc_command_execute( ARV_GC_COMMAND(start),NULL);
-	printf("Beginning camera acquisition");
+	printf("Beginning camera acquisition\n");
 }
 
 void Teledyne::sendTrigger(){
@@ -96,7 +96,7 @@ void Teledyne::sendTrigger(){
 
 
 unsigned char* Teledyne::getBuffer(){
-	return 0;
+	return NULL;
 }
 
 void Teledyne::endCam(){
@@ -110,7 +110,7 @@ void Teledyne::endCam(){
 
 	end = arv_gc_get_node (genicam, "AcquisitionStop");
 	arv_gc_command_execute (ARV_GC_COMMAND (end), NULL);
-	printf("Ended camera acquisition");
+	printf("Ended camera acquisition\n");
 
 	g_object_unref (stream);
 	g_object_unref (device);

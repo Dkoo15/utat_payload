@@ -19,7 +19,7 @@ void compVision::showImage(){
 	if (!SHOWIMAGE) return;
 
 	imshow("Image Preview",preview);
-	waitKey(0);
+	waitKey(30);
 }
 
 void compVision::processRaw(unsigned char* buffptr){	
@@ -39,8 +39,8 @@ int compVision::saveFullImage(int n){
 	char filename[150];
 	const char* dir = DIRECTORY;
 	
-	if (!rgb.data) return -1;
-	if (!SAVEIMAGE) return -1;
+	if (!rgb.data) return 0;
+	if (!SAVEIMAGE) return 0;
 
 	sprintf(filename, "%simg%04d.jpg",dir,n);	
 	printf("Saving to file %s \n", filename);
@@ -55,7 +55,7 @@ int compVision::saveFullImage(int n){
 vector <unsigned char> compVision::compressPreview(){
 
 	vector<unsigned char> jpgbuff; 
-	printf("Compressing preview into jpeg buffer");
+	printf("Compressing preview into jpeg buffer\n");
 	imencode(".jpg",preview,jpgbuff,jpg_params);
 
 	//Average time ~10 ms

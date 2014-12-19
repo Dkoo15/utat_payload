@@ -10,47 +10,53 @@ extern "C"{
 #include "uavcv.h"
 #include "uavimage.h"
 
+#define TESTING true
+
 int main(){
-//	Uavcam *camera  = new Imgfromfile();
-	Teledyne *camera = new Teledyne(); 
+	Uavcam *camera; 
 	unsigned char* imgbuf;
-	compVision* ip = new compVision;
+	compVision* ip;
 	vector<unsigned char> jpgbuffer;
 	char input;
+ 	int camera_ok, buffer_ok;
 
-	char *val, *set;
-	char commands[25][100];
-	int n;
+	//---Construct Classes
+	if (TESTING)	
+		camera = new Imgfromfile();
+	else
+		camera = new Teledyne();
 
-	camera->parseInputs(commands,&n);
+	ip = new compVision();
 
-	for (int i = 0; i < n; i++){
-		set = strtok(commands[i],"=");
-		val = strtok(NULL,"=");
-		printf("Feature = %s  |||| Value = %s", set,val);
-	}	
-	
-/*	camera->initCamSetting();
-	printf("Start camera loop?\n");
-	camera->startCam();
-	input = getchar();
-//	while(input != 'x'){
-		
-		camera->sendTrigger();
-		imgbuf = camera->getBuffer();
-		ip->processRaw(imgbuf);
-		ip->showImage();
-		ip->saveFullImage(0);
-		jpgbuffer = ip->compressPreview();
-		printf("Size of compress preview jpg %lu", jpgbuffer.size());
-//		printf("Press x to close\n");
-//		input = getchar();
-//	}
-	camera->endCam();
-	jpgbuffer.clear();
+	//---Initialize Camera Settings
+	camera_ok = camera->initCamSetting();
 
+	if (camera_ok) {
+		printf("Start camera loop? [y/n] \n");
+		input = getchar();
+		getchar();
 
-	delete camera;a*/
+		if (input == 'y'){ 	//---Start Acquisition
+
+			camera->startCam();
+
+			while(input != 'x'){  //--Main Acquisition Loop
+				camera->sendTrigger();
+				imgbuf = camera->getBuffer();
+				ip->processRaw(imgbuf);
+				ip->showImage();
+				ip->saveFullImage(0);
+				jpgbuffer = ip->compressPreview();
+				printf("Size of compress preview jpg %lu\n", jpgbuffer.size());
+				printf("Press x to close\n");
+				input = getchar();
+			}
+
+			camera->endCam();
+			jpgbuffer.clear();
+		}
+	}
+	delete camera;
 	delete ip;
 	return 0;
 }
