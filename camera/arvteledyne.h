@@ -5,7 +5,8 @@ extern "C"{
 #include "uavcamera.h"
 #include <stdio.h>
 #include <string.h>
-#define BUFFER_Q_SIZE 20
+#define BUFFER_Q_SIZE 10
+#define WAIT_CYCLES 25
 
 class Teledyne: public Uavcam {
 
@@ -25,4 +26,5 @@ class Teledyne: public Uavcam {
 		ArvDevice *device;
 		ArvStream *stream;
 		ArvGcNode *trigger;
+		int payload;
 };

@@ -14,7 +14,6 @@ int Teledyne::initCamSetting(){
 	char commands[25][100];
 	char *setting, *value;
 	GType value_type;
-	gint payload;
 
 //  Initial Setup - Find the Camera	
 	printf("Looking for the Camera...\n");
@@ -70,6 +69,7 @@ int Teledyne::initCamSetting(){
 	feature = arv_gc_get_node (genicam, "PayloadSize");
 	payload = arv_gc_integer_get_value (ARV_GC_INTEGER (feature), NULL);
 	printf("PayloadSize  = %d \n", payload);
+	buffer = new unsigned char[payload];
 
 	//Create Stream and fill buffer queue
 	stream = arv_device_create_stream (device, NULL, NULL);
@@ -96,7 +96,32 @@ void Teledyne::sendTrigger(){
 
 
 unsigned char* Teledyne::getBuffer(){
-	return NULL;
+	ArvBuffer * arvbufr;
+	int snap = 0;
+	int cycles = 0;
+	do {
+		g_usleep (10000);
+		cycles++;
+		do  {
+			arvbufr = arv_stream_try_pop_buffer (stream);
+			if (arvbufr != NULL){
+				printf("Buffer: ");
+				switch(arvbufr->status){
+					case ARV_BUFFER_STATUS_SUCCESS: printf("success\n"); break;
+					case ARV_BUFFER_STATUS_TIMEOUT: printf("timeout\n"); break;
+					case ARV_BUFFER_STATUS_FILLING: printf("filling\n"); break;
+					default: printf("error\n");
+				}
+				if (arvbufr->status == ARV_BUFFER_STATUS_SUCCESS){
+					memcpy(buffer,arvbufr->data,payload);
+					snap = 1;			
+				}	 
+				arv_stream_push_buffer (stream, arvbufr);
+			}		 
+		} while (arvbufr != NULL);
+	}while(cycles < WAIT_CYCLES && snap == 0);
+
+	return buffer;
 }
 
 void Teledyne::endCam(){

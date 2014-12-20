@@ -18,7 +18,7 @@ int main(){
 	compVision* ip;
 	vector<unsigned char> jpgbuffer;
 	char input;
- 	int camera_ok, buffer_ok;
+ 	int camera_ok;
 
 	//---Construct Classes
 	if (TESTING)	
@@ -43,13 +43,14 @@ int main(){
 			while(input != 'x'){  //--Main Acquisition Loop
 				camera->sendTrigger();
 				imgbuf = camera->getBuffer();
-				ip->processRaw(imgbuf);
-				ip->showImage();
-				ip->saveFullImage(0);
-				jpgbuffer = ip->compressPreview();
-				printf("Size of compress preview jpg %lu\n", jpgbuffer.size());
-				printf("Press x to close\n");
-				input = getchar();
+				if(imgbuf){
+					ip->processRaw(imgbuf);
+					ip->showImage();
+					ip->saveFullImage(0);
+					jpgbuffer = ip->compressPreview();
+					printf("Press x to close\n");
+					input = getchar();
+				}
 			}
 
 			camera->endCam();

@@ -30,7 +30,6 @@ unsigned char* Imgfromfile::getBuffer(){
 	char filename[150];
 	size_t result;
 
-	if(!buffer) return 0;
 	if(i > n)   i = 0;
 	
 	sprintf(filename,"scratch/img00%d",i);	
@@ -42,8 +41,9 @@ unsigned char* Imgfromfile::getBuffer(){
 		return 0;
 	}
 	else printf("Opened %s\n", filename);
-	
+
 	result = fread(buffer, 1, bufsize, pFile);
+	
 	fclose(pFile);
 	if(result != bufsize) 	printf("Buffer size error\n");
 	return buffer;
