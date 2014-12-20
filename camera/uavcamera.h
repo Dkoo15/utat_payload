@@ -3,8 +3,6 @@
 class Uavcam {
 
 	public: 
-		long bufsize; 
-
 		Uavcam(){}
 		virtual ~Uavcam(){}
 		
@@ -15,5 +13,6 @@ class Uavcam {
 		virtual void endCam() = 0;
 
 	protected:
+		int payload;
 		unsigned char* buffer;
 };

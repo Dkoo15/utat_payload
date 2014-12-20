@@ -9,8 +9,8 @@ Imgfromfile:: ~Imgfromfile(){
 }
 
 int Imgfromfile::initCamSetting(){
-	bufsize = 12582912;
-	buffer = new unsigned char[bufsize];
+	payload = 12582912;
+	buffer = new unsigned char[payload];
 	i = 0;
 	n = 5;
 	return 1;
@@ -42,10 +42,10 @@ unsigned char* Imgfromfile::getBuffer(){
 	}
 	else printf("Opened %s\n", filename);
 
-	result = fread(buffer, 1, bufsize, pFile);
+	result = fread(buffer, 1, payload, pFile);
 	
 	fclose(pFile);
-	if(result != bufsize) 	printf("Buffer size error\n");
+	if(result != payload) 	printf("Buffer size error\n");
 	return buffer;
 }
 

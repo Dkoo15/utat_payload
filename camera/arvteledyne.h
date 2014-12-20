@@ -26,5 +26,4 @@ class Teledyne: public Uavcam {
 		ArvDevice *device;
 		ArvStream *stream;
 		ArvGcNode *trigger;
-		int payload;
 };
