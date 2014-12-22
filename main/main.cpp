@@ -61,3 +61,16 @@ int main(){
 	delete ip;
 	return 0;
 }
+
+int checkLogInit(FILE *pfile){
+//Open the gps.log file and check if it has been written.
+//If exists, read the log and find out the line, then add new photos to that line
+//If it doesnt exist, create the log
+// Later write a cleanup.sh script to make a folder and mv *.jpg *.log to that folder/
+}
+
+void writeLine(){
+//use stdio to printf the line
+//ie. printf(/%s, %f %f... ., filename, lat, long, altitude)
+//fflush() - to print the the file!
+}
