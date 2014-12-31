@@ -1,0 +1,11 @@
+# !/bin/bash
+
+time_stamp=$(date +%m-%d-%H-%M-%S)
+mkdir "save/${time_stamp}"
+for f in save/*.jpg; do
+mv "$f" "save/${time_stamp}"
+done
+
+for f in save/*.log; do 
+mv "$f" "save/${time_stamp}"
+done

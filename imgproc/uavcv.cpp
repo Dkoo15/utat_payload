@@ -19,7 +19,7 @@ void compVision::showImage(){
 	if (!SHOWIMAGE) return;
 
 	imshow("Image Preview",preview);
-	waitKey(30);
+	waitKey(1000);
 }
 
 void compVision::processRaw(unsigned char* buffptr){	

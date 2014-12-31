@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <signal.h>
 
 extern "C"{
 #include <arv.h>
@@ -12,13 +13,51 @@ extern "C"{
 
 #define TESTING true
 
+sig_atomic_t finish = 0;
+
+int checkLogInit(){
+	int saved = 0;
+	FILE* tryFile = fopen("save/uav_gps.log", "r");
+
+	if(tryFile == NULL){
+		printf("Starting from scratch\n");
+		return -1;
+		}
+	else {
+		char linebuf[150];
+		if (fgets(linebuf, 150, tryFile)!=NULL){
+			while(fgets(linebuf,150,tryFile) != NULL){
+			saved++;
+			}
+		}
+		fclose(tryFile);
+		printf("Starting after %d images\n", saved);
+	    }
+	return saved;
+}
+
+void writeLine(FILE* pFile){
+//use stdio to printf the line
+//ie. printf(/%s, %f %f... ., filename, lat, long, altitude)
+//ALWAYS FLUSH
+	fprintf(pFile,"go go go!\n");
+	fflush(pFile);
+}
+
+void exit_signal(int param){
+	finish  = 1;
+	printf("Exiting on next frame completion...\n");
+}
+
 int main(){
 	Uavcam *camera; 
 	unsigned char* imgbuf;
 	compVision* ip;
 	vector<unsigned char> jpgbuffer;
-	char input;
+	char start;
  	int camera_ok;
+	int num_saved;
+	FILE* gpsfile;
 
 	//---Construct Classes
 	if (TESTING)	
@@ -28,19 +67,30 @@ int main(){
 
 	ip = new compVision();
 
-	//---Initialize Camera Settings
-	camera_ok = camera->initCamSetting();
+	//Open and Check log
+	num_saved = checkLogInit();
+	gpsfile = fopen("save/uav_gps.log","a");
+	if (num_saved == -1){
+		fprintf(gpsfile,"FILE \t LATITUDE \t LONGITUDE \t ALTITUDE \t HEADING \n");
+		fflush(gpsfile);
+		num_saved ++;
+	}
 
+	//Initialize Camera Settings
+	camera_ok = camera->initCamSetting();
+	(void) signal(SIGINT,exit_signal);
+	
+	//Start Camera!
 	if (camera_ok) {
 		printf("Start camera loop? [y/n] \n");
-		input = getchar();
+		start = getchar();
 		getchar();
 
-		if (input == 'y'){ 	//---Start Acquisition
+		if (start == 'y'){ 	//---Start Acquisition
 
 			camera->startCam();
 
-			while(input != 'x'){  //--Main Acquisition Loop
+			while(!finish){  //--Main Acquisition Loop
 				camera->sendTrigger();
 				imgbuf = camera->getBuffer();
 				if(imgbuf){
@@ -48,8 +98,8 @@ int main(){
 					ip->showImage();
 					ip->saveFullImage(0);
 					jpgbuffer = ip->compressPreview();
-					printf("Press x to close\n");
-					input = getchar();
+					writeLine(gpsfile);
+
 				}
 			}
 
@@ -57,20 +107,8 @@ int main(){
 			jpgbuffer.clear();
 		}
 	}
+	fclose(gpsfile);
 	delete camera;
 	delete ip;
 	return 0;
-}
-
-int checkLogInit(FILE *pfile){
-//Open the gps.log file and check if it has been written.
-//If exists, read the log and find out the line, then add new photos to that line
-//If it doesnt exist, create the log
-// Later write a cleanup.sh script to make a folder and mv *.jpg *.log to that folder/
-}
-
-void writeLine(){
-//use stdio to printf the line
-//ie. printf(/%s, %f %f... ., filename, lat, long, altitude)
-//fflush() - to print the the file!
 }
