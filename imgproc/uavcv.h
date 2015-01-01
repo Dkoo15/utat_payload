@@ -1,3 +1,5 @@
+#pragma once
+
 #include <opencv2/opencv.hpp>
 #include <vector>
 
@@ -9,19 +11,16 @@
 #define DIRECTORY "save/"
 #define SHOWIMAGE true
 #define STEAMIMAGE true
-#define SAVEIMAGE false
+#define SAVEIMAGE true
 
 namespace uavision{
-	cv::Mat raw;
-	cv::Mat rgb;
-	cv::Mat preview;
-
-	void initialize();
-	void freemats();
 	
-	void processRaw(); 
+	void initialize();
+	void freeMats();
+	
+	void processRaw(unsigned char* buffptr); 
 	void showImage();
-	vector<unsigned char> compressPreview();
+	std::vector<unsigned char> compressPreview();
 
 	bool saveFullImage(int n);
 

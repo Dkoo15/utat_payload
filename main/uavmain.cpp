@@ -22,7 +22,7 @@ std::condition_variable convar;
 volatile bool write_img = false;
 volatile bool stream_packet = false;;
 volatile bool request_gps = false;
-int ipic; 
+int ip; 
 
 int checkLogInit(){
 	int saved = 0;
@@ -66,7 +66,7 @@ void imageWriter(){
 
 		if(finish == 1) break;	//If finish signal is given, skip and leave;
 		
-		compVision::saveFullImage(ipic++);
+		uavision::saveFullImage(ip++);
 	   	write_img = true;	
 	}
 }
@@ -92,8 +92,7 @@ void wakeThrd(int id){
 int main(){
 	Uavcam *camera; 
 	unsigned char *rawbuf;
-	compVision* ip;
-	vector<unsigned char> jpgbuffer;
+	std::vector<unsigned char> jpgbuffer;
 	char start;
  	bool camera_ok;
 	int num_saved;
@@ -106,8 +105,6 @@ int main(){
 	else
 		camera = new Teledyne();
 
-	ip = new compVision();
-
 	//Open and Check log
 	num_saved = checkLogInit();
 	gpsfile = fopen("save/uav_gps.log","a");
@@ -119,8 +116,9 @@ int main(){
 
 	//Initialize Camera Settings
 	camera_ok = camera->initCamSetting();
+	uavision::initialize();
 	(void) signal(SIGINT,exit_signal); 	//Set up ctrl+c signal
-   	ipic = num_saved;	
+   	ip = num_saved;	
 
 	//Start Camera!
 	if (camera_ok) {
@@ -136,12 +134,11 @@ int main(){
 				camera->sendTrigger();
 				rawbuf = camera->getBuffer();
 				if(rawbuf){ //Acquired Image
-					ip->processRaw(rawbuf);
-					ip->showImage();
-					ipic++;
+					uavision::processRaw(rawbuf);
+					uavision::showImage();
 					//wakeThrd(2);
-					compVision::saveFullImage(ipic++);
-					jpgbuffer = ip->compressPreview();
+					uavision::saveFullImage(ip++);
+					jpgbuffer = uavision::compressPreview();
 					writeLine(gpsfile);
 				}
 			}
@@ -153,6 +150,6 @@ int main(){
 	//image_save_thrd.join();
 	fclose(gpsfile);
 	delete camera;
-	delete ip;
+	uavision::freeMats();
 	return 0;
 }
