@@ -6,7 +6,7 @@ class Uavcam {
 		Uavcam(){}
 		virtual ~Uavcam(){}
 		
-		virtual int initCamSetting() = 0;
+		virtual bool initCamSetting() = 0;
 		virtual void startCam() = 0;
 		virtual void sendTrigger() = 0;
 		virtual unsigned char* getBuffer() = 0;

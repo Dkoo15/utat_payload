@@ -8,12 +8,12 @@ Imgfromfile:: ~Imgfromfile(){
 	if(buffer) delete buffer;
 }
 
-int Imgfromfile::initCamSetting(){
+bool Imgfromfile::initCamSetting(){
 	payload = 12582912;
 	buffer = new unsigned char[payload];
 	i = 0;
 	n = 5;
-	return 1;
+	return true;
 }
 
 void Imgfromfile::startCam(){

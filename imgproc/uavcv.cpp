@@ -3,16 +3,42 @@
 
 //Temp debug stuff
 //#include <time.h>
+//
+unsigned char* compVision::rgbptr = NULL;
 
-compVision:: compVision(){
+bool compVision::saveFullImage(int n){
+	char filename[150];
+	const char* dir = DIRECTORY;
+	
+	vector<int> jpg_params;
 	jpg_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 	jpg_params.push_back(JPEG_QUAL);
+
+	if (!rgbptr) return false;
+	if (!SAVEIMAGE) return false;
+
+	sprintf(filename, "%simg%04d.jpg",dir,n);	
+	printf("Saving to file %s \n", filename);
+
+	Mat fulljpeg = Mat(IMGHEIGHT, IMGWIDTH, CV_8UC3, rgbptr);
+	imwrite(filename, fulljpeg, jpg_params);
+
+	//Average Time ~300 ms
+	//This function will be called form a separate thread
+	fulljpeg.release();	
+	jpg_params.clear();
+	return true;
+}
+
+
+compVision::compVision(){
 	namedWindow("Image Preview", WINDOW_AUTOSIZE);
 }
 
-compVision:: ~compVision(){
+compVision::~compVision(){
 	preview.release();
 	raw.release();
+	rgb.release();
 }
 
 void compVision::showImage(){
@@ -23,7 +49,6 @@ void compVision::showImage(){
 }
 
 void compVision::processRaw(unsigned char* buffptr){	
-
 	raw = Mat(IMGHEIGHT,IMGWIDTH,CV_8UC1,buffptr);
 	cvtColor(raw,rgb,CV_BayerGB2RGB);
 	
@@ -33,28 +58,16 @@ void compVision::processRaw(unsigned char* buffptr){
 	
 	resize(rgb,preview,Size(),DOWNSIZE,DOWNSIZE,INTER_NEAREST);
 	//Average time = ~2 ms
-}
-
-int compVision::saveFullImage(int n){
-	char filename[150];
-	const char* dir = DIRECTORY;
 	
-	if (!rgb.data) return 0;
-	if (!SAVEIMAGE) return 0;
-
-	sprintf(filename, "%simg%04d.jpg",dir,n);	
-	printf("Saving to file %s \n", filename);
-
-	imwrite(filename, rgb, jpg_params);
-	//Average Time ~300 ms
-	//This operation definitely needs to be put on a separate thread;
-	
-	return 1;
+	rgbptr = rgb.data;
 }
 
 vector <unsigned char> compVision::compressPreview(){
-
 	vector<unsigned char> jpgbuff; 
+	vector<int> jpg_params;
+	jpg_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+	jpg_params.push_back(JPEG_QUAL);
+
 	printf("Compressing preview into jpeg buffer\n");
 	imencode(".jpg",preview,jpgbuff,jpg_params);
 

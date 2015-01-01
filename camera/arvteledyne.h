@@ -14,7 +14,7 @@ class Teledyne: public Uavcam {
 		Teledyne();
 		~Teledyne();	
 		
-		int initCamSetting();
+		bool initCamSetting();
 		void startCam();
 		void sendTrigger();
 		unsigned char* getBuffer();

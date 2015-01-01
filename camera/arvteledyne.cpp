@@ -8,7 +8,7 @@ Teledyne:: ~Teledyne(){
 	if(buffer) delete buffer;
 }
 
-int Teledyne::initCamSetting(){
+bool Teledyne::initCamSetting(){
 	ArvGcNode *feature;
  	int i, n;
 	char commands[25][100];
@@ -21,7 +21,7 @@ int Teledyne::initCamSetting(){
 
 	if(device == NULL) {
 		printf("No camera found!\n");
-		return 0;	
+		return false;	
 	}
 	printf("Found %s \n", arv_get_device_id(0));
 	genicam = arv_device_get_genicam(device);
@@ -30,7 +30,7 @@ int Teledyne::initCamSetting(){
 	parseInputs(commands,&n);
 	if (n == 0) {
 		printf("No features found, can't take proper pictures\n");
-		return 0;
+		return false;
 	}
 
 //Apply setting and display to confirm
@@ -80,7 +80,7 @@ int Teledyne::initCamSetting(){
 	//Get and save the node that is the software trigger
 	trigger = arv_gc_get_node(genicam,"TriggerSoftware");
 
-	return 1;
+	return true;
 }
 
 void Teledyne::startCam(){

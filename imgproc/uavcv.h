@@ -11,23 +11,19 @@
 #define STEAMIMAGE true
 #define SAVEIMAGE false
 
-using namespace cv;
+namespace uavision{
+	cv::Mat raw;
+	cv::Mat rgb;
+	cv::Mat preview;
 
-class compVision {
+	void initialize();
+	void freemats();
+	
+	void processRaw(); 
+	void showImage();
+	vector<unsigned char> compressPreview();
 
-	public: 
-		compVision();
-		~compVision();
-		
-		void processRaw(unsigned char* buffptr); 
-		void showImage();
-		int saveFullImage(int n);
-		vector<unsigned char> compressPreview();
+	bool saveFullImage(int n);
 
-	private:
-		Mat raw;
-		Mat rgb;
-		Mat preview;
-		vector<int> jpg_params;
-};
+}
 

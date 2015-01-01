@@ -1,14 +1,14 @@
-add_executable(uavPayload main.cpp)
-install (TARGETS uavPayload DESTINATION /Users/davidkoo/uav/)
+add_executable(utxPayload uavmain.cpp)
+install (TARGETS utxPayload DESTINATION /Users/davidkoo/uav/)
 
 include_directories( ../camera/)
 include_directories(../imgproc/)
 
 #Linked Libraries
-target_link_libraries(uavPayload uavcam)
-target_link_libraries(uavPayload imageproc)
-target_link_libraries(uavPayload ${OpenCV_LIBS})
-target_link_libraries(uavPayload ${GLIB_LIBRARIES})
-target_link_libraries(uavPayload ${GOBJECT_LIBRARIES})
-target_link_libraries(uavPayload ${aravis_LIBRARY})
+target_link_libraries(utxPayload uavcam)
+target_link_libraries(utxPayload imageproc)
+target_link_libraries(utxPayload ${OpenCV_LIBS})
+target_link_libraries(utxPayload ${GLIB_LIBRARIES})
+target_link_libraries(utxPayload ${GOBJECT_LIBRARIES})
+target_link_libraries(utxPayload ${aravis_LIBRARY})
 
