@@ -10,7 +10,7 @@ extern "C"{
 //Libraries
 #include "arvteledyne.h" 
 #include "fakecamera.h"
-#include "uavcv.h"
+#include "imgproc.h"
 #include "imagepacket.h"
 
 //Preprocessor flags

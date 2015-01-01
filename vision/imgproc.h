@@ -11,7 +11,7 @@
 #define DIRECTORY "save/"
 #define SHOWIMAGE true
 #define STEAMIMAGE true
-#define SAVEIMAGE true
+#define SAVEIMAGE false
 
 namespace uavision{
 	
