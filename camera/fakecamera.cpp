@@ -17,38 +17,42 @@ bool Imgfromfile::initCamSetting(){
 }
 
 void Imgfromfile::startCam(){
-	printf("Reading pictures from the saved buffers \n");
+	std::cout << "Reading pictures from scratch/" << std::endl;
 }
 
 void Imgfromfile::sendTrigger(){
-	printf("Fake trigger\n");
+	std::cout << "Fake software trigger" << std::endl;
 }
 
 
 unsigned char* Imgfromfile::getBuffer(){
-	FILE* pFile;
-	char filename[150];
-	size_t result;
+	std::ifstream bufferfile;
+	std::stringstream ss;
+	std::string filename;
 
 	if(i > n)   i = 0;
 	
-	sprintf(filename,"scratch/img00%d",i);	
+	ss << "scratch/img00" <<i;
+	filename = ss.str();
 	i++;
-	pFile = fopen(filename, "rb");
+	bufferfile.open(filename,std::ifstream::binary);
 
-	if (pFile==NULL) {
-		printf("No file named %s\n", filename);
+	if (!bufferfile) {
+		std::cout << "No file named "<< filename << std::endl;
 		return 0;
 	}
-	else printf("Opened %s\n", filename);
+	else std::cout << "Opened " << filename << std::endl;
 
-	result = fread(buffer, 1, payload, pFile);
+	bufferfile.read((char*)buffer,payload);
 	
-	fclose(pFile);
-	if(result != payload) 	printf("Buffer size error\n");
+	if(bufferfile) std::cout<<"Read successful"<<std::endl;
+	else std::cout<<"Read unsuccessful"<<std::endl;
+
+	bufferfile.close();	
+
 	return buffer;
 }
 
 void Imgfromfile::endCam(){
-	printf("Fake end \n");
+	std::cout << "Fake camera finish" << std::endl;
 }

@@ -1,6 +1,6 @@
 struct uavimage{
 	double latitude, longitude, altitude, heading;
-	char* fullfilenname;
+	std::string fullfilenname;
 	unsigned char* prvewbuffer;
 	int buffersize;
 };

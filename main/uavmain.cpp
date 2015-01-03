@@ -1,11 +1,13 @@
-#include <stdio.h>
-#include <signal.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <iomanip>
+
+#include <csignal>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-extern "C"{
-#include <arv.h>
-}
 
 //Libraries
 #include "arvteledyne.h" 
@@ -26,47 +28,44 @@ int ip;
 
 int checkLogInit(){
 	int saved = 0;
-	FILE* tryFile = fopen("save/uav_gps.log", "r");
-
-	if(tryFile == NULL){
-		printf("Starting from scratch\n");
+	std::ifstream logstream ("save/uav_gps.log", std::ifstream::in);
+	
+	if(!logstream){
+		std::cout << "Starting from scratch" << std::endl;
 		return -1;
 		}
 	else {
-		char linebuf[150];
-		if (fgets(linebuf, 150, tryFile)!=NULL){
-			while(fgets(linebuf,150,tryFile) != NULL){
-			saved++;
-			}
+		std::string line;
+		if (std::getline(logstream,line)){
+			while(std::getline(logstream,line))  saved++;
 		}
-		fclose(tryFile);
-		printf("Starting after %d images\n", saved);
+		logstream.close();
+		std::cout << "Starting after " << saved << " images" << std::endl;
 	    }
 	return saved;
 }
 
-void writeLine(FILE* pFile){
-//use stdio to printf the line
-//ie. printf(/%s, %f %f... ., filename, lat, long, altitude)
-//ALWAYS FLUSH
-	fprintf(pFile,"go go go!\n");
-	fflush(pFile);
+void writeLine(std::ofstream &logstream, std::string imgname){
+	logstream << imgname << std::endl;
 }
 
 void exit_signal(int param){
 	finish  = 1;
-	printf("Exiting on next frame completion...\n");
+	std::cout << "Exiting on next frame completion.." << std::endl;
 }
 
 void imageWriter(){
 	std::unique_lock<std::mutex> lock(mtx);
+	std::stringstream ss;
 	while(1){ //repeat
 		
 		while(finish == 0 && write_img == false) convar.wait(lock);//Wait for work
 
 		if(finish == 1) break;	//If finish signal is given, skip and leave;
-		
-		uavision::saveFullImage(ip++);
+		//ss<<"save/img";
+		//ss<<std::setfill('0')<<std::setw(4)<<++ip<<".jpg";
+		uavision::saveFullImage(ss.str());
+		ss.str("");
 	   	write_img = true;	
 	}
 }
@@ -96,10 +95,11 @@ int main(){
 	char start;
  	bool camera_ok;
 	int num_saved;
-	FILE* gpsfile;
+	std::ofstream gpstream;
+	std::stringstream ss;
 	//	std::thread image_save_thrd(imageWriter);
 	
-	//---Construct Classes
+	//Construct Classes
 	if (TESTING)	
 		camera = new Imgfromfile();
 	else
@@ -107,25 +107,23 @@ int main(){
 
 	//Open and Check log
 	num_saved = checkLogInit();
-	gpsfile = fopen("save/uav_gps.log","a");
+	gpstream.open("save/uav_gps.log",std::ofstream::app);
 	if (num_saved == -1){
-		fprintf(gpsfile,"FILE \t LATITUDE \t LONGITUDE \t ALTITUDE \t HEADING \n");
-		fflush(gpsfile);
+		gpstream <<"Image File Name \t Latitude \t Longitude \t Altitude \t Heading" << std::endl;
 		num_saved++;
 	}
 
 	//Initialize Camera Settings
 	camera_ok = camera->initCamSetting();
 	uavision::initialize();
-	(void) signal(SIGINT,exit_signal); 	//Set up ctrl+c signal
+	std::signal(SIGINT,exit_signal); 	//Set up ctrl+c signal
    	ip = num_saved;	
 
 	//Start Camera!
 	if (camera_ok) {
-		printf("Start camera loop? [y/n] \n");
-		start = getchar();
-		getchar();
-
+		std::cout << "Start camera acquisition? (y/n)" << std::endl;
+		std::cin >> start;
+		
 		if (start == 'y'){ 	//---Start Acquisition
 
 			camera->startCam();
@@ -137,9 +135,13 @@ int main(){
 					uavision::processRaw(rawbuf);
 					uavision::showImage();
 					//wakeThrd(2);
-					uavision::saveFullImage(ip++);
+					ss<<"save/im";
+					ss<<std::setfill('0')<<std::setw(4)<<++ip;
+					ss<<".jpg";
+					uavision::saveFullImage(ss.str());
 					jpgbuffer = uavision::compressPreview();
-					writeLine(gpsfile);
+					writeLine(gpstream,ss.str());
+					ss.str("");
 				}
 			}
 
@@ -148,7 +150,7 @@ int main(){
 		}
 	}
 	//image_save_thrd.join();
-	fclose(gpsfile);
+	gpstream.close();
 	delete camera;
 	uavision::freeMats();
 	return 0;

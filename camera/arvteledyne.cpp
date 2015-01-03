@@ -10,57 +10,53 @@ Teledyne:: ~Teledyne(){
 
 bool Teledyne::initCamSetting(){
 	ArvGcNode *feature;
- 	int i, n;
-	char commands[25][100];
-	char *setting, *value;
+	std::vector<std::string> settings, values;
 	GType value_type;
 
 //  Initial Setup - Find the Camera	
-	printf("Looking for the Camera...\n");
+	std::cout<<"Looking for the Camera ...\n";
 	device = arv_open_device(NULL);
 
 	if(device == NULL) {
-		printf("No camera found!\n");
+		std::cout<< "No camera found!" << std::endl;
 		return false;	
 	}
-	printf("Found %s \n", arv_get_device_id(0));
+	std::cout<< "Found "<< arv_get_device_id(0) << std::endl;
 	genicam = arv_device_get_genicam(device);
 
 // Parse inputs from a configuration file
-	parseInputs(commands,&n);
-	if (n == 0) {
-		printf("No features found, can't take proper pictures\n");
+  	parseInputs(settings,values);
+	if (settings.size() == 0 || (settings.size() != values.size())){
+		std::cout <<"Error parsing configuration file" << std::endl;
 		return false;
 	}
 
 //Apply setting and display to confirm
-	for (i = 2; i < n; i++) {
-		setting = strtok(commands[i],"=");
-		value = strtok(NULL,"=");
-		feature = arv_gc_get_node(genicam,setting);
+	for  (std::vector<std::string>::size_type i = 0; i != settings.size(); i++){
+		feature = arv_gc_get_node(genicam,settings[i].c_str());
 
 		if (ARV_IS_GC_FEATURE_NODE (feature)) {
-			if (ARV_IS_GC_COMMAND (feature)) printf ("%s is a command\n", setting);
+			if (ARV_IS_GC_COMMAND (feature)) std::cout<< settings[i] << " is a command" <<std::endl;
 			else {
-				if (value != NULL)
-					arv_gc_feature_node_set_value_from_string (ARV_GC_FEATURE_NODE (feature), value, NULL);
+				arv_gc_feature_node_set_value_from_string (ARV_GC_FEATURE_NODE (feature), values[i].c_str(), NULL);
 				
 				value_type = arv_gc_feature_node_get_value_type (ARV_GC_FEATURE_NODE (feature));
+				std::cout << settings[i] << " = ";
 				switch (value_type) { 
 				 case G_TYPE_INT64:
-				 	printf("%s = %" G_GINT64_FORMAT "\n", setting, arv_gc_integer_get_value (ARV_GC_INTEGER (feature), NULL));;
+					std::cout << arv_gc_integer_get_value(ARV_GC_INTEGER(feature),NULL) << std::endl;
 			 	 	break;
 			 	 case G_TYPE_DOUBLE:
-			 		printf("%s = %g\n", setting, arv_gc_float_get_value(ARV_GC_FLOAT(feature),NULL));
+					std::cout << arv_gc_float_get_value(ARV_GC_FLOAT(feature),NULL) << std::endl;
 			 		break;
 				 case G_TYPE_STRING:
-					printf("%s = %s\n", setting, arv_gc_string_get_value(ARV_GC_STRING(feature),NULL));
+					std::cout << arv_gc_string_get_value(ARV_GC_STRING(feature),NULL) << std::endl;
 					break;
 				 case G_TYPE_BOOLEAN:
-					printf("%s = %s\n", setting, arv_gc_integer_get_value(ARV_GC_INTEGER(feature),NULL)!=0 ?  "true" : "false");
+					std::cout << arv_gc_integer_get_value(ARV_GC_INTEGER(feature),NULL) << std::endl;
 					break;
 				 default:
-					printf("%s = %s\n", setting, arv_gc_feature_node_get_value_as_string(ARV_GC_FEATURE_NODE(feature), NULL));
+					std::cout << arv_gc_feature_node_get_value_as_string(ARV_GC_FEATURE_NODE(feature),NULL) << std::endl; 
 				}
 			}
 		}
@@ -68,13 +64,14 @@ bool Teledyne::initCamSetting(){
 
 	feature = arv_gc_get_node (genicam, "PayloadSize");
 	payload = arv_gc_integer_get_value (ARV_GC_INTEGER (feature), NULL);
-	printf("PayloadSize  = %d \n", payload);
+	std::cout<< "PayloadSize = " << payload << std::endl;
+
 	buffer = new unsigned char[payload];
 
 	//Create Stream and fill buffer queue
 	stream = arv_device_create_stream (device, NULL, NULL);
 
-        for (i = 0; i < BUFFER_Q_SIZE; i++)
+        for (int i = 0; i < BUFFER_Q_SIZE; i++)
 		arv_stream_push_buffer (stream, arv_buffer_new (payload, NULL));
 	
 	//Get and save the node that is the software trigger
@@ -86,18 +83,18 @@ bool Teledyne::initCamSetting(){
 void Teledyne::startCam(){
 	ArvGcNode *start = arv_gc_get_node(genicam, "AcquisitionStart");
 	arv_gc_command_execute( ARV_GC_COMMAND(start),NULL);
-	printf("Beginning camera acquisition\n");
+	std::cout<< "Beginning camera acquisition"<<std::endl;
 }
 
 void Teledyne::sendTrigger(){
 	arv_gc_command_execute(ARV_GC_COMMAND(trigger),NULL);
-	printf("Sent Software Trigger to Teledyne\n"); 
+	std::cout<< "Sent software trigger" << std::endl;
 }
 
 
 unsigned char* Teledyne::getBuffer(){
 	ArvBuffer * arvbufr;
-	int snap = 0;
+	bool snapped = false;
 	int cycles = 0;
 	do {
 		g_usleep (10000);
@@ -105,21 +102,20 @@ unsigned char* Teledyne::getBuffer(){
 		do  {
 			arvbufr = arv_stream_try_pop_buffer (stream);
 			if (arvbufr != NULL){
-				printf("Buffer: ");
+				std::cout<<"Buffer: ";
 				switch(arvbufr->status){
-					case ARV_BUFFER_STATUS_SUCCESS: printf("success\n"); break;
-					case ARV_BUFFER_STATUS_TIMEOUT: printf("timeout\n"); break;
-					case ARV_BUFFER_STATUS_FILLING: printf("filling\n"); break;
-					default: printf("error\n");
+					case ARV_BUFFER_STATUS_SUCCESS: std::cout<<"buffer success"<<std::endl; break;
+					case ARV_BUFFER_STATUS_TIMEOUT: std::cout<<"timeout"<<std::endl; break;
+					default: std::cout<<"error"<<std::endl;;
 				}
 				if (arvbufr->status == ARV_BUFFER_STATUS_SUCCESS){
 					memcpy(buffer,arvbufr->data,payload);
-					snap = 1;			
+					snapped = true;			
 				}	 
 				arv_stream_push_buffer (stream, arvbufr);
 			}		 
 		} while (arvbufr != NULL);
-	}while(cycles < WAIT_CYCLES && snap == 0);
+	}while(cycles < WAIT_CYCLES && !snapped);
 
 	return buffer;
 }
@@ -129,27 +125,28 @@ void Teledyne::endCam(){
 	guint64 n_processed_buffers, n_failures, n_underruns;
 
 	arv_stream_get_statistics (stream, &n_processed_buffers, &n_failures, &n_underruns);
-	printf("Processed buffers = %d\n", (unsigned int) n_processed_buffers);
-	printf("Failures          = %d\n", (unsigned int) n_failures);
-	printf("Underruns         = %d\n", (unsigned int) n_underruns);
+	std::cout << "Processed buffers = " << (unsigned int) n_processed_buffers << "\n";
+	std::cout << "Failures 	   	= " << (unsigned int) n_failures << "\n";
+	std::cout << "Underruns 	= " << (unsigned int) n_underruns << "\n";
 
 	end = arv_gc_get_node (genicam, "AcquisitionStop");
 	arv_gc_command_execute (ARV_GC_COMMAND (end), NULL);
-	printf("Ended camera acquisition\n");
+	std::cout << "Ended Camera Acquisition" << std::endl;
 
 	g_object_unref (stream);
 	g_object_unref (device);
 }
 
-void Teledyne::parseInputs(char commands[][100], int *num){
-	*num = 0;
-	FILE* configFile;
-	configFile = fopen("teledyne.cfg", "r");
+void Teledyne::parseInputs(std::vector<std::string> &settings, std::vector<std::string> &values){
+	std::ifstream cfgstream("teledyne.cfg", std::ifstream::in);
+	std::string word;
+	if(!cfgstream) return;
 
-	if(configFile == NULL) return;
-
-	while(fgets(commands[(*num)], 100, configFile) != NULL){
-		(*num)++;
-	}
-	fclose(configFile);
+	while(std::getline(cfgstream,word,'=')) {
+		settings.push_back(word);
+		std::getline(cfgstream,word);
+		values.push_back(word);
+	}	
+		
+	cfgstream.close();
 }

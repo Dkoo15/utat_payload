@@ -1,5 +1,7 @@
 #include "uavcamera.h"
-#include <stdio.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 class Imgfromfile: public Uavcam {
 

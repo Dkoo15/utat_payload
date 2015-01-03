@@ -3,8 +3,11 @@ extern "C"{
 }
 
 #include "uavcamera.h"
-#include <stdio.h>
-#include <string.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
 #define BUFFER_Q_SIZE 10
 #define WAIT_CYCLES 25
 
@@ -19,7 +22,7 @@ class Teledyne: public Uavcam {
 		void sendTrigger();
 		unsigned char* getBuffer();
 		void endCam();
-		void parseInputs(char commands[][100], int *num);
+		void parseInputs(std::vector<std::string> &settings, std::vector<std::string> &values);
 
 	private:
 		ArvGc *genicam;

@@ -1,8 +1,6 @@
 #include "imgproc.h"
-#include <stdio.h>
-
-//Temp debug stuff
 //#include <time.h>
+
 namespace uavision
 {
         cv::Mat raw;
@@ -10,19 +8,13 @@ namespace uavision
         cv::Mat preview;
         std::vector<int> jpg_params;
 
-	bool saveFullImage(int n){
-		char filename[150];
-		const char* dir = DIRECTORY;
-		
+	bool saveFullImage(std::string imagename){
 		if (!rgb.data) return false;
-		if (!SAVEIMAGE) return false;
+		if (!RECORD) return false;
 
-		sprintf(filename, "%simg%04d.jpg",dir,n);	
-		printf("Saving to file %s \n", filename);
+		std::cout <<"Saving to file " << imagename << std::endl;
+		cv::imwrite(imagename, rgb, jpg_params); //Average Time ~300 ms
 
-		cv::imwrite(filename, rgb, jpg_params);
-
-		//Average Time ~300 ms
 		//This function will be called form a separate thread
 		return true;
 	}
@@ -31,7 +23,8 @@ namespace uavision
 	void initialize(){
 		jpg_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 		jpg_params.push_back(JPEG_QUAL);
-		cv::namedWindow("Image Preview", cv::WINDOW_AUTOSIZE);
+		if (VIEW)
+			cv::namedWindow("Image Preview", cv::WINDOW_AUTOSIZE);
 	}
 
 	void freeMats(){
@@ -42,8 +35,7 @@ namespace uavision
 	}
 
 	void showImage(){
-		if (!SHOWIMAGE) return;
-
+		if (!VIEW) return;
 		cv::imshow("Image Preview",preview);
 		cv::waitKey(1000);
 	}
@@ -51,8 +43,8 @@ namespace uavision
 	void processRaw(unsigned char* buffptr){	
 		raw = cv::Mat(IMGHEIGHT,IMGWIDTH,CV_8UC1,buffptr);
 		cv::cvtColor(raw,rgb,CV_BayerGB2RGB);
-		
-		printf("Bayer to RGB conversion \n");
+	
+		std::cout << "Bayer to RGB conversion" << std::endl;	
 		//Time = ~30 ms for the first time since data must be allocated
 		//Average Time = ~15 ms afterwards since OpenCV resuses the old buffer
 		
@@ -63,8 +55,8 @@ namespace uavision
 
 	std::vector <unsigned char> compressPreview(){
 		std::vector<unsigned char> jpgbuff; 
-		
-		printf("Compressing preview into jpeg buffer\n");
+
+		std::cout << "Compressing preview into jpeg" << std::endl;		
 		cv::imencode(".jpg",preview,jpgbuff,jpg_params);
 
 		//Average time ~10 ms
