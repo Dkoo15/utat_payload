@@ -6,9 +6,6 @@
 #include <iostream>
 #include <fstream>
 
-#define IMGHEIGHT 3072
-#define IMGWIDTH 4096
-#define IMGSIZE 12582912
 #define DOWNSIZE 0.25
 #define JPEG_QUAL 90
 #define VIEW true
@@ -16,12 +13,12 @@
 
 namespace uavision{
 	
-	void initialize();
+	void initialize(int h, int w);
 	void freeMats();
 	
 	void processRaw(unsigned char* buffptr); 
-	void showImage();
-	std::vector<unsigned char> compressPreview();
+	void createPreview();
+	void compressPreview(std::vector<unsigned char> &jpgbufr);
 
 	bool saveFullImage(std::string imagename);
 

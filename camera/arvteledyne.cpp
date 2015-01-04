@@ -1,6 +1,8 @@
 #include "arvteledyne.h"
 
 Teledyne::Teledyne(){
+	imheight = 3072;
+	imwidth  = 4096;
 	buffer = NULL;
 }
 

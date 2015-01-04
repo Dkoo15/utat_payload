@@ -1,6 +1,8 @@
 #include "fakecamera.h"
 
 Imgfromfile::Imgfromfile(){
+	imheight = 3072;
+	imwidth  = 4096;
 	buffer = NULL;
 }
 

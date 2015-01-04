@@ -25,6 +25,7 @@ volatile bool write_img = false;
 volatile bool stream_packet = false;;
 volatile bool request_gps = false;
 int ip; 
+uavimage impacket;
 
 int checkLogInit(){
 	int saved = 0;
@@ -62,8 +63,10 @@ void imageWriter(){
 		while(finish == 0 && write_img == false) convar.wait(lock);//Wait for work
 
 		if(finish == 1) break;	//If finish signal is given, skip and leave;
-		//ss<<"save/img";
-		//ss<<std::setfill('0')<<std::setw(4)<<++ip<<".jpg";
+	
+		ss<<"save/im";
+		ss<<std::setfill('0')<<std::setw(4)<<++ip;
+		ss<<".jpg";
 		uavision::saveFullImage(ss.str());
 		ss.str("");
 	   	write_img = true;	
@@ -97,7 +100,7 @@ int main(){
 	int num_saved;
 	std::ofstream gpstream;
 	std::stringstream ss;
-	//	std::thread image_save_thrd(imageWriter);
+	//std::thread image_save_thrd(imageWriter);
 	
 	//Construct Classes
 	if (TESTING)	
@@ -115,7 +118,7 @@ int main(){
 
 	//Initialize Camera Settings
 	camera_ok = camera->initCamSetting();
-	uavision::initialize();
+	uavision::initialize(camera->imheight, camera->imwidth);
 	std::signal(SIGINT,exit_signal); 	//Set up ctrl+c signal
    	ip = num_saved;	
 
@@ -133,13 +136,13 @@ int main(){
 				rawbuf = camera->getBuffer();
 				if(rawbuf){ //Acquired Image
 					uavision::processRaw(rawbuf);
-					uavision::showImage();
+					uavision::createPreview();
 					//wakeThrd(2);
 					ss<<"save/im";
 					ss<<std::setfill('0')<<std::setw(4)<<++ip;
 					ss<<".jpg";
 					uavision::saveFullImage(ss.str());
-					jpgbuffer = uavision::compressPreview();
+					uavision::compressPreview(jpgbuffer);
 					writeLine(gpstream,ss.str());
 					ss.str("");
 				}

@@ -7,6 +7,7 @@ namespace uavision
         cv::Mat rgb;
         cv::Mat preview;
         std::vector<int> jpg_params;
+	int width, height;
 
 	bool saveFullImage(std::string imagename){
 		if (!rgb.data) return false;
@@ -20,11 +21,13 @@ namespace uavision
 	}
 
 
-	void initialize(){
+	void initialize(int h, int w){
+		width = w;
+		height = h;
 		jpg_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 		jpg_params.push_back(JPEG_QUAL);
-		if (VIEW)
-			cv::namedWindow("Image Preview", cv::WINDOW_AUTOSIZE);
+
+		if (VIEW) cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);
 	}
 
 	void freeMats(){
@@ -34,34 +37,26 @@ namespace uavision
 		jpg_params.clear();
 	}
 
-	void showImage(){
-		if (!VIEW) return;
-		cv::imshow("Image Preview",preview);
-		cv::waitKey(1000);
+	void createPreview(){
+		cv::resize(rgb,preview,cv::Size(),DOWNSIZE,DOWNSIZE,cv::INTER_NEAREST);
+		//Average time = ~2 ms
+
+		if (VIEW){
+			cv::imshow("Camera Viewer",preview);
+			cv::waitKey(1000);
+		}
 	}
 
 	void processRaw(unsigned char* buffptr){	
-		raw = cv::Mat(IMGHEIGHT,IMGWIDTH,CV_8UC1,buffptr);
+		raw = cv::Mat(height,width,CV_8UC1,buffptr);
 		cv::cvtColor(raw,rgb,CV_BayerGB2RGB);
 	
 		std::cout << "Bayer to RGB conversion" << std::endl;	
-		//Time = ~30 ms for the first time since data must be allocated
 		//Average Time = ~15 ms afterwards since OpenCV resuses the old buffer
-		
-		cv::resize(rgb,preview,cv::Size(),DOWNSIZE,DOWNSIZE,cv::INTER_NEAREST);
-		//Average time = ~2 ms
-		
 	}
 
-	std::vector <unsigned char> compressPreview(){
-		std::vector<unsigned char> jpgbuff; 
-
+	void compressPreview(std::vector<unsigned char> &jpgbufr){
 		std::cout << "Compressing preview into jpeg" << std::endl;		
-		cv::imencode(".jpg",preview,jpgbuff,jpg_params);
-
-		//Average time ~10 ms
-		//This could go into the main execution loop
-
-		return jpgbuff;
+		cv::imencode(".jpg",preview,jpgbufr,jpg_params);
 	}
 }

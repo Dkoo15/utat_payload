@@ -12,7 +12,8 @@ class Uavcam {
 		virtual unsigned char* getBuffer() = 0;
 		virtual void endCam() = 0;
 
+		int imheight, imwidth, payload;
+
 	protected:
-		int payload;
 		unsigned char* buffer;
 };
