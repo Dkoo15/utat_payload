@@ -9,15 +9,15 @@ namespace uavision
         std::vector<int> jpg_params;
 	int width, height;
 
-	bool saveFullImage(std::string imagename){
+	bool saveFullImage(std::string imagename){ 	//This function will be called form a separate thread
+		bool iswritten;
 		if (!rgb.data) return false;
 		if (!RECORD) return false;
 
 		std::cout <<"Saving to file " << imagename << std::endl;
-		cv::imwrite(imagename, rgb, jpg_params); //Average Time ~300 ms
+		iswritten = cv::imwrite(imagename, rgb, jpg_params); //Average Time ~300 ms
 
-		//This function will be called form a separate thread
-		return true;
+		return iswritten;
 	}
 
 
@@ -43,16 +43,15 @@ namespace uavision
 
 		if (VIEW){
 			cv::imshow("Camera Viewer",preview);
-			cv::waitKey(1000);
+			cv::waitKey(500);
 		}
 	}
 
 	void processRaw(unsigned char* buffptr){	
+		std::cout << "Bayer to RGB conversion" << std::endl;	
 		raw = cv::Mat(height,width,CV_8UC1,buffptr);
 		cv::cvtColor(raw,rgb,CV_BayerGB2RGB);
-	
-		std::cout << "Bayer to RGB conversion" << std::endl;	
-		//Average Time = ~15 ms afterwards since OpenCV resuses the old buffer
+		//Average Time = ~15 ms 
 	}
 
 	void compressPreview(std::vector<unsigned char> &jpgbufr){

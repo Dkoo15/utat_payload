@@ -22,7 +22,7 @@ class Teledyne: public Uavcam {
 		void sendTrigger();
 		unsigned char* getBuffer();
 		void endCam();
-		void parseInputs(std::vector<std::string> &settings, std::vector<std::string> &values);
+		void parseInputs(std::vector<std::string> &commands);;
 
 	private:
 		ArvGc *genicam;

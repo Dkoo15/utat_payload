@@ -16,7 +16,7 @@
 #include "imagepacket.h"
 
 //Preprocessor flags
-#define TESTING true
+#define TESTING false
 
 volatile sig_atomic_t finish = 0;
 std::mutex mtx;
