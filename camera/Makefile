@@ -157,29 +157,29 @@ uavcam/fast:
 	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/build
 .PHONY : uavcam/fast
 
-arvteledyne.o: arvteledyne.cpp.o
-.PHONY : arvteledyne.o
+araviscamera.o: araviscamera.cpp.o
+.PHONY : araviscamera.o
 
 # target to build an object file
-arvteledyne.cpp.o:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/arvteledyne.cpp.o
-.PHONY : arvteledyne.cpp.o
+araviscamera.cpp.o:
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.o
+.PHONY : araviscamera.cpp.o
 
-arvteledyne.i: arvteledyne.cpp.i
-.PHONY : arvteledyne.i
+araviscamera.i: araviscamera.cpp.i
+.PHONY : araviscamera.i
 
 # target to preprocess a source file
-arvteledyne.cpp.i:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/arvteledyne.cpp.i
-.PHONY : arvteledyne.cpp.i
+araviscamera.cpp.i:
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.i
+.PHONY : araviscamera.cpp.i
 
-arvteledyne.s: arvteledyne.cpp.s
-.PHONY : arvteledyne.s
+araviscamera.s: araviscamera.cpp.s
+.PHONY : araviscamera.s
 
 # target to generate assembly for a file
-arvteledyne.cpp.s:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/arvteledyne.cpp.s
-.PHONY : arvteledyne.cpp.s
+araviscamera.cpp.s:
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.s
+.PHONY : araviscamera.cpp.s
 
 fakecamera.o: fakecamera.cpp.o
 .PHONY : fakecamera.o
@@ -218,9 +218,9 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... uavcam"
-	@echo "... arvteledyne.o"
-	@echo "... arvteledyne.i"
-	@echo "... arvteledyne.s"
+	@echo "... araviscamera.o"
+	@echo "... araviscamera.i"
+	@echo "... araviscamera.s"
 	@echo "... fakecamera.o"
 	@echo "... fakecamera.i"
 	@echo "... fakecamera.s"

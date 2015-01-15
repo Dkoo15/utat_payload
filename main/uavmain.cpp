@@ -10,7 +10,7 @@
 #include <condition_variable>
 
 //Libraries
-#include "arvteledyne.h" 
+#include "araviscamera.h" 
 #include "fakecamera.h"
 #include "imgproc.h"
 #include "imagepacket.h"
@@ -106,7 +106,7 @@ int main(){
 	if (TESTING)	
 		camera = new Imgfromfile();
 	else
-		camera = new Teledyne();
+		camera = new AravisCam();
 
 	//Open and Check log
 	num_saved = checkLogInit();

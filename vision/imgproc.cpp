@@ -43,7 +43,7 @@ namespace uavision
 
 		if (VIEW){
 			cv::imshow("Camera Viewer",preview);
-			cv::waitKey(500);
+			cv::waitKey(FRAME_MS);
 		}
 	}
 
