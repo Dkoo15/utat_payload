@@ -1,53 +1,42 @@
 #include "araviscamera.h"
 
-AravisCam::AravisCam(){
-	imheight = 3072;
-	imwidth  = 4096;
-	buffer = NULL;
-}
+AravisCam::AravisCam(){}
 
-AravisCam:: ~AravisCam(){
-	if(buffer) delete buffer;
-}
+AravisCam:: ~AravisCam(){}
 
 bool AravisCam::initCamSetting(){
 	ArvGcNode *feature;
-	std::vector<std::string> commands; 
+	std::vector<std::string> settings; 
 	GType value_type;
-	const char *stuff;
-	char **thangs;
+	bool config_ok;
 
-// Parse inputs from a configuration file
-  	parseInputs(commands);
-	if (commands.size() == 0){
-		std::cout <<"Error parsing configuration file" << std::endl;
-		return false;
-	}
-
-//  Initial Setup - Find the Camera	
-	std::cout<<"Looking for the Camera ...\n";
+//  Initial Setup - Read config and find the Camera	
+	config_ok = parseInputs(settings);
+	if(!config_ok) return false;
+	
+	std::cout<<"Looking for the Camera...\n";
 	device = arv_open_device(NULL);
-
+	
 	if(device == NULL) {
 		std::cout<< "No camera found!" << std::endl;
 		return false;	
 	}
+
 	std::cout<< "Found "<< arv_get_device_id(0) << std::endl;
 	genicam = arv_device_get_genicam(device);
 
 //Apply setting and display to confirm
-	for  (std::vector<std::string>::size_type i = 0; i != commands.size(); i++){
-		stuff = commands[i].c_str();
-		thangs = g_strsplit(stuff,"=",2);
-		feature = arv_device_get_feature(device,thangs[0]);
+	for  (std::vector<std::string>::size_type i = 0; i != settings.size(); i++){
+		feature = arv_device_get_feature(device,settings[i].c_str());
 
 		if (ARV_IS_GC_FEATURE_NODE (feature)) {
-			if (ARV_IS_GC_COMMAND (feature)) std::cout<< thangs[0] << " is a command" <<std::endl;
+			if (ARV_IS_GC_COMMAND (feature)) std::cout<< settings[i] << " is a command" <<std::endl;
 			else {
 				//I can't set the feature properly. Use initteledyne
-				//arv_gc_feature_node_set_value_from_string (ARV_GC_FEATURE_NODE (feature), thangs[1], NULL);
+				//arv_gc_feature_node_set_value_from_string (ARV_GC_FEATURE_NODE (feature), value, NULL);
 				value_type = arv_gc_feature_node_get_value_type (ARV_GC_FEATURE_NODE (feature));
-				std::cout << thangs[0] << " = ";
+				std::cout << settings[i] << " = ";
+
 				switch (value_type) { 
 				 case G_TYPE_INT64:
 					std::cout << arv_gc_integer_get_value(ARV_GC_INTEGER(feature),NULL) << std::endl;
@@ -71,8 +60,6 @@ bool AravisCam::initCamSetting(){
 	feature = arv_gc_get_node (genicam, "PayloadSize");
 	payload = arv_gc_integer_get_value (ARV_GC_INTEGER (feature), NULL);
 	std::cout<< "PayloadSize = " << payload << std::endl;
-
-	buffer = new unsigned char[payload];
 
 	//Create Stream and fill buffer queue
 	stream = arv_device_create_stream (device, NULL, NULL);
@@ -98,7 +85,7 @@ void AravisCam::sendTrigger(){
 }
 
 
-unsigned char* AravisCam::getBuffer(){
+bool AravisCam::getBuffer(std::vector<unsigned char> &buffer){
 	ArvBuffer * arvbufr;
 	bool snapped = false;
 	int cycles = 0;
@@ -115,7 +102,7 @@ unsigned char* AravisCam::getBuffer(){
 					default: std::cout<<"error"<<std::endl;;
 				}
 				if (arvbufr->status == ARV_BUFFER_STATUS_SUCCESS){
-					memcpy(buffer,arvbufr->data,payload);
+					memcpy(&buffer[0],arvbufr->data,payload);
 					snapped = true;			
 				}	 
 				arv_stream_push_buffer (stream, arvbufr);
@@ -123,9 +110,10 @@ unsigned char* AravisCam::getBuffer(){
 		} while (arvbufr != NULL && !snapped);
 	}while(cycles < WAIT_CYCLES && !snapped);
 
-	if (cycles >= WAIT_CYCLES)
-		std::cout<< "Waited too long" << std::endl;
-	return buffer;
+	if (cycles >= WAIT_CYCLES)	
+		return false;
+	else 	
+		return true;
 }
 
 void AravisCam::endCam(){
@@ -145,13 +133,20 @@ void AravisCam::endCam(){
 	g_object_unref (device);
 }
 
-void AravisCam::parseInputs(std::vector<std::string> &commands){
+bool AravisCam::parseInputs(std::vector<std::string> &commands){
 	std::ifstream cfgstream("teledyne.cfg", std::ifstream::in);
 	std::string word;
-	if(!cfgstream) return;
+	bool cfg_ok = false;
 
-	while(std::getline(cfgstream,word)) 
-		commands.push_back(word);	
-		
+	if(!cfgstream) return cfg_ok;
+
+	if(cfgstream >> dim[0] && cfgstream >> dim[1]){
+		std::getline(cfgstream,word);
+		while(std::getline(cfgstream,word)) 
+			commands.push_back(word);	
+		cfg_ok = true;
+	}
+
 	cfgstream.close();
+	return cfg_ok;
 }

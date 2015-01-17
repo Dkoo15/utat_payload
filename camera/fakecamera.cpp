@@ -1,18 +1,12 @@
 #include "fakecamera.h"
 
-Imgfromfile::Imgfromfile(){
-	imheight = 3072;
-	imwidth  = 4096;
-	buffer = NULL;
-}
+Imgfromfile::Imgfromfile(){}
 
-Imgfromfile:: ~Imgfromfile(){
-	if(buffer) delete buffer;
-}
+Imgfromfile:: ~Imgfromfile(){}
 
 bool Imgfromfile::initCamSetting(){
+	dim[0] = 4096; dim[1] = 3072;
 	payload = 12582912;
-	buffer = new unsigned char[payload];
 	i = 0;
 	n = 5;
 	return true;
@@ -27,7 +21,7 @@ void Imgfromfile::sendTrigger(){
 }
 
 
-unsigned char* Imgfromfile::getBuffer(){
+bool Imgfromfile::getBuffer(std::vector<unsigned char> &buffer){
 	std::ifstream bufferfile;
 	std::stringstream ss;
 	std::string filename;
@@ -41,18 +35,18 @@ unsigned char* Imgfromfile::getBuffer(){
 
 	if (!bufferfile) {
 		std::cout << "No file named "<< filename << std::endl;
-		return 0;
+		return false;
 	}
 	else std::cout << "Opened " << filename << std::endl;
 
-	bufferfile.read((char*)buffer,payload);
+	bufferfile.read((char*)&buffer[0],payload);
 	
 	if(bufferfile) std::cout<<"Read successful"<<std::endl;
 	else std::cout<<"Read unsuccessful"<<std::endl;
 
 	bufferfile.close();	
 
-	return buffer;
+	return true;
 }
 
 void Imgfromfile::endCam(){

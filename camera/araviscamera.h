@@ -6,9 +6,8 @@ extern "C"{
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
 
-#define BUFFER_Q_SIZE 10
+#define BUFFER_Q_SIZE 5
 #define WAIT_CYCLES 25
 
 class AravisCam: public Uavcam {
@@ -20,9 +19,9 @@ class AravisCam: public Uavcam {
 		bool initCamSetting();
 		void startCam();
 		void sendTrigger();
-		unsigned char* getBuffer();
+		bool getBuffer(std::vector<unsigned char> &buffer);
 		void endCam();
-		void parseInputs(std::vector<std::string> &commands);;
+		bool parseInputs(std::vector<std::string> &commands);;
 
 	private:
 		ArvGc *genicam;

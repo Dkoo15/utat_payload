@@ -16,7 +16,7 @@
 #include "imagepacket.h"
 
 //Preprocessor flags
-#define TESTING false
+#define TESTING true
 
 volatile sig_atomic_t finish = 0;
 std::mutex mtx;
@@ -93,10 +93,10 @@ void wakeThrd(int id){
 }
 int main(){
 	Uavcam *camera; 
-	unsigned char *rawbuf;
+	std::vector<unsigned char> rawbuf;
 	std::vector<unsigned char> jpgbuffer;
 	char start;
- 	bool camera_ok;
+ 	bool camera_ok, buffer_ok;
 	int num_saved;
 	std::ofstream gpstream;
 	std::stringstream ss;
@@ -118,7 +118,9 @@ int main(){
 
 	//Initialize Camera Settings
 	camera_ok = camera->initCamSetting();
-	uavision::initialize(camera->imheight, camera->imwidth);
+	rawbuf.resize(camera->payload);
+	uavision::initialize(camera->dim);
+
 	std::signal(SIGINT,exit_signal); 	//Set up ctrl+c signal
    	ip = num_saved;	
 
@@ -133,8 +135,8 @@ int main(){
 
 			while(!finish){  //--Main Acquisition Loop
 				camera->sendTrigger();
-				rawbuf = camera->getBuffer();
-				if(rawbuf){ //Acquired Image
+				buffer_ok = camera->getBuffer(rawbuf);
+				if(buffer_ok){ //Acquired Image
 					uavision::processRaw(rawbuf);
 					uavision::createPreview();
 					//wakeThrd(2);
@@ -144,7 +146,7 @@ int main(){
 					uavision::saveFullImage(ss.str());
 					uavision::compressPreview(jpgbuffer);
 					writeLine(gpstream,ss.str());
-					ss.str("");
+					ss.str(""); 
 				}
 			}
 

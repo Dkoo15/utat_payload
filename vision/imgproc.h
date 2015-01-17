@@ -14,10 +14,10 @@
 
 namespace uavision{
 	
-	void initialize(int h, int w);
+	void initialize(int dim[2]);
 	void freeMats();
 	
-	void processRaw(unsigned char* buffptr); 
+	void processRaw(std::vector<unsigned char> &rawbuffer); 
 	void createPreview();
 	void compressPreview(std::vector<unsigned char> &jpgbufr);
 

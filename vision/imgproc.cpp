@@ -7,7 +7,7 @@ namespace uavision
         cv::Mat rgb;
         cv::Mat preview;
         std::vector<int> jpg_params;
-	int width, height;
+	cv::Size size;
 
 	bool saveFullImage(std::string imagename){ 	//This function will be called form a separate thread
 		bool iswritten;
@@ -21,11 +21,10 @@ namespace uavision
 	}
 
 
-	void initialize(int h, int w){
-		width = w;
-		height = h;
+	void initialize(int dim[2]){
 		jpg_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 		jpg_params.push_back(JPEG_QUAL);
+		size = cv::Size(dim[0], dim[1]);
 
 		if (VIEW) cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);
 	}
@@ -47,9 +46,8 @@ namespace uavision
 		}
 	}
 
-	void processRaw(unsigned char* buffptr){	
-		std::cout << "Bayer to RGB conversion" << std::endl;	
-		raw = cv::Mat(height,width,CV_8UC1,buffptr);
+	void processRaw(std::vector<unsigned char> &rawbuffer){	
+		raw = cv::Mat(size,CV_8UC1,&rawbuffer[0]);
 		cv::cvtColor(raw,rgb,CV_BayerGB2RGB);
 		//Average Time = ~15 ms 
 	}

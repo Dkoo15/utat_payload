@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 class Uavcam {
 
@@ -9,11 +10,9 @@ class Uavcam {
 		virtual bool initCamSetting() = 0;
 		virtual void startCam() = 0;
 		virtual void sendTrigger() = 0;
-		virtual unsigned char* getBuffer() = 0;
+		virtual bool getBuffer(std::vector<unsigned char> &buffer) = 0;
 		virtual void endCam() = 0;
 
-		int imheight, imwidth, payload;
+		int payload, dim[2];
 
-	protected:
-		unsigned char* buffer;
 };

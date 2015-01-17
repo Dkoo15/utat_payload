@@ -1,16 +1,1 @@
-arv-tool-0.4 control GevSCPSPacketSize=4000 ExposureAuto=Off ExposureMode=Timed ExposureTime=10000 GainAuto=Once exposureAlignment=Reset autoBrightnessMode=Off TriggerMode=On TriggerSource=Software AcquisitionMode=Continuous 
-# Packet Size - Set to 1500 standard, set to 4000 if jumbo frames allowed
-# GevSCPSPacketSize=1500 
-# Timed Raw Exposure for motion
-# ExposureAuto=Off 
-# ExposureMode=Timed 
-# ExposureTime=10000 
-# Autogain 
-# GainAuto=Once 
-# exposureAlignment=Reset 
-# autoBrightnessMode=Off 
-# Recurring Software Trigger
-# TriggerMode=On 
-# TriggerSource=Software 
-# AcquisitionMode=Continuous 
-
+arv-tool-0.4 control GevSCPSPacketSize=9000 ExposureAuto=Off ExposureMode=Timed ExposureTime=10000 GainAuto=Once exposureAlignment=Reset autoBrightnessMode=Off TriggerMode=On TriggerSource=Software AcquisitionMode=Continuous 
