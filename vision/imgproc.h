@@ -15,7 +15,6 @@
 namespace uavision{
 	
 	void initialize(int dim[2]);
-	void freeMats();
 	
 	void processRaw(std::vector<unsigned char> &rawbuffer); 
 	void createPreview();

@@ -157,6 +157,5 @@ int main(){
 	//image_save_thrd.join();
 	gpstream.close();
 	delete camera;
-	uavision::freeMats();
 	return 0;
 }

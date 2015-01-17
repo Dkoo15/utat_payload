@@ -29,16 +29,8 @@ namespace uavision
 		if (VIEW) cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);
 	}
 
-	void freeMats(){
-		preview.release();
-		raw.release();
-		rgb.release();
-		jpg_params.clear();
-	}
-
 	void createPreview(){
 		cv::resize(rgb,preview,cv::Size(),DOWNSIZE,DOWNSIZE,cv::INTER_NEAREST);
-		//Average time = ~2 ms
 
 		if (VIEW){
 			cv::imshow("Camera Viewer",preview);
@@ -48,8 +40,7 @@ namespace uavision
 
 	void processRaw(std::vector<unsigned char> &rawbuffer){	
 		raw = cv::Mat(size,CV_8UC1,&rawbuffer[0]);
-		cv::cvtColor(raw,rgb,CV_BayerGB2RGB);
-		//Average Time = ~15 ms 
+		cv::cvtColor(raw,rgb,CV_BayerGB2RGB);	//Average Time = ~15 ms 
 	}
 
 	void compressPreview(std::vector<unsigned char> &jpgbufr){
