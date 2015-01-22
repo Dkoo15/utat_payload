@@ -1,3 +1,4 @@
+//Standard Libraries
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -9,19 +10,19 @@
 #include <mutex>
 #include <condition_variable>
 
-#include <sys/time.h>
-
-//Libraries
+//Project header files
 #include "araviscamera.h" 
 #include "fakecamera.h"
 #include "imgproc.h"
 #include "imagepacket.h"
 
-//Preprocessor flagsI
-#define USE_CAMERA true
+//Preprocessor flags
+#define USE_CAMERA false
 #define ACQUIRE_GPS 1
 #define SAVE_IMAGE 2
 #define STREAM_IMAGE 3
+
+#define PREFIX "save/im"
 
 volatile std::sig_atomic_t finish = 0;
 std::mutex mtx;
@@ -52,8 +53,10 @@ int checkLogInit(){
 	return saved;
 }
 
-void writeLine(std::ofstream &logstream, std::string imgname){
-	logstream << imgname << std::endl;
+void writeLine(std::ofstream &logstream){
+	logstream<<PREFIX;
+	logstream<<std::setfill('0')<<std::setw(4)<<ip;
+	logstream << ".jpg"<< std::endl;
 }
 
 void exit_signal(int param){
@@ -65,14 +68,13 @@ void imageWriter(){
 	std::unique_lock<std::mutex> lock(mtx);
 	std::stringstream ss;
 	while(1){ //repeat
-		
 		while( stop_work == false && write_img == false) convar.wait(lock);//Wait for work
 
 		std::cout<<"Image Thread Awoken"<<std::endl;
 		if(stop_work) break;	//If finish signal is given, skip and leave;
 	
-		ss<<"save/im";
-		ss<<std::setfill('0')<<std::setw(4)<<++ip;
+		ss<<PREFIX;
+		ss<<std::setfill('0')<<std::setw(4)<<ip;
 		ss<<".jpg";
 		uavision::saveFullImage(ss.str());
 		ss.str("");
@@ -83,8 +85,7 @@ void imageWriter(){
 
 void wakeThread(int id){
 	std::unique_lock<std::mutex> lock(mtx);
-	switch (id)
-	{
+	switch (id){
 		case ACQUIRE_GPS:
 			request_gps = true;
 			break;
@@ -97,9 +98,9 @@ void wakeThread(int id){
 		default:
 			break;
 	}
-
 	convar.notify_all();
 }
+
 int main(){
 	Uavcam *camera; 
 	std::vector<unsigned char> rawbuf;
@@ -108,7 +109,6 @@ int main(){
  	bool camera_ok, buffer_ok;
 	int num_saved;
 	std::ofstream gpstream;
-	std::stringstream ss;
 	std::thread image_save_thrd(imageWriter);
 
 	//Construct Classes
@@ -145,30 +145,21 @@ int main(){
 			while(!finish){  //--Main Acquisition Loop
 				camera->sendTrigger();
 				buffer_ok = camera->getBuffer(rawbuf);
+
 				if(buffer_ok){ //Acquired Image
+					ip++;
 					uavision::processRaw(rawbuf);
-					ss<<"save/im";
-					ss<<std::setfill('0')<<std::setw(4)<<++ip;
-					ss<<".jpg";
-					struct timeval start, end;
-					gettimeofday(&start,NULL);
-//					wakeThread(SAVE_IMAGE);
-					uavision::saveFullImage(ss.str());
+					wakeThread(SAVE_IMAGE);
 					uavision::createPreview();
-					gettimeofday(&end,NULL);
-					double delta =(end.tv_usec-start.tv_usec)/1000;
-					std::cout<<delta<<"ms"<<std::endl;
 					uavision::compressPreview(jpgbuffer);
-					writeLine(gpstream,ss.str());
-					ss.str(""); 
+					writeLine(gpstream);
 				}
 			}
 			
-
 			camera->endCam();
-			jpgbuffer.clear();
 		}
 	}
+
 	stop_work = true;
 	wakeThread(-1);
 	image_save_thrd.join();
