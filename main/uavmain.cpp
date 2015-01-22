@@ -9,21 +9,27 @@
 #include <mutex>
 #include <condition_variable>
 
+#include <sys/time.h>
+
 //Libraries
 #include "araviscamera.h" 
 #include "fakecamera.h"
 #include "imgproc.h"
 #include "imagepacket.h"
 
-//Preprocessor flags
-#define TESTING true
+//Preprocessor flagsI
+#define USE_CAMERA true
+#define ACQUIRE_GPS 1
+#define SAVE_IMAGE 2
+#define STREAM_IMAGE 3
 
-volatile sig_atomic_t finish = 0;
+volatile std::sig_atomic_t finish = 0;
 std::mutex mtx;
 std::condition_variable convar;
-volatile bool write_img = false;
-volatile bool stream_packet = false;;
-volatile bool request_gps = false;
+bool write_img = false;
+bool stream_packet = false;;
+bool request_gps = false;
+bool stop_work = false;
 int ip; 
 uavimage impacket;
 
@@ -60,29 +66,32 @@ void imageWriter(){
 	std::stringstream ss;
 	while(1){ //repeat
 		
-		while(finish == 0 && write_img == false) convar.wait(lock);//Wait for work
+		while( stop_work == false && write_img == false) convar.wait(lock);//Wait for work
 
-		if(finish == 1) break;	//If finish signal is given, skip and leave;
+		std::cout<<"Image Thread Awoken"<<std::endl;
+		if(stop_work) break;	//If finish signal is given, skip and leave;
 	
 		ss<<"save/im";
 		ss<<std::setfill('0')<<std::setw(4)<<++ip;
 		ss<<".jpg";
 		uavision::saveFullImage(ss.str());
 		ss.str("");
-	   	write_img = true;	
+	   	write_img = false;	
 	}
+	std::cout<<"Image Writing Thread Done"<<std::endl;
 }
-void wakeThrd(int id){
+
+void wakeThread(int id){
 	std::unique_lock<std::mutex> lock(mtx);
 	switch (id)
 	{
-		case 1:
+		case ACQUIRE_GPS:
 			request_gps = true;
 			break;
-		case 2:
+		case SAVE_IMAGE:
 			write_img = true;
 			break;
-		case 3:
+		case STREAM_IMAGE:
 			stream_packet = true;
 			break;
 		default:
@@ -100,10 +109,10 @@ int main(){
 	int num_saved;
 	std::ofstream gpstream;
 	std::stringstream ss;
-	//std::thread image_save_thrd(imageWriter);
-	
+	std::thread image_save_thrd(imageWriter);
+
 	//Construct Classes
-	if (TESTING)	
+	if (!USE_CAMERA)	
 		camera = new Imgfromfile();
 	else
 		camera = new AravisCam();
@@ -138,23 +147,31 @@ int main(){
 				buffer_ok = camera->getBuffer(rawbuf);
 				if(buffer_ok){ //Acquired Image
 					uavision::processRaw(rawbuf);
-					uavision::createPreview();
-					//wakeThrd(2);
 					ss<<"save/im";
 					ss<<std::setfill('0')<<std::setw(4)<<++ip;
 					ss<<".jpg";
+					struct timeval start, end;
+					gettimeofday(&start,NULL);
+//					wakeThread(SAVE_IMAGE);
 					uavision::saveFullImage(ss.str());
+					uavision::createPreview();
+					gettimeofday(&end,NULL);
+					double delta =(end.tv_usec-start.tv_usec)/1000;
+					std::cout<<delta<<"ms"<<std::endl;
 					uavision::compressPreview(jpgbuffer);
 					writeLine(gpstream,ss.str());
 					ss.str(""); 
 				}
 			}
+			
 
 			camera->endCam();
 			jpgbuffer.clear();
 		}
 	}
-	//image_save_thrd.join();
+	stop_work = true;
+	wakeThread(-1);
+	image_save_thrd.join();
 	gpstream.close();
 	delete camera;
 	return 0;

@@ -1,5 +1,4 @@
 #include "imgproc.h"
-//#include <time.h>
 
 namespace uavision
 {
@@ -14,8 +13,8 @@ namespace uavision
 		if (!rgb.data) return false;
 		if (!RECORD) return false;
 
-		std::cout <<"Saving to file " << imagename << std::endl;
 		iswritten = cv::imwrite(imagename, rgb, jpg_params); //Average Time ~300 ms
+		std::cout <<"Saved image to file " << imagename << std::endl;
 
 		return iswritten;
 	}
@@ -31,7 +30,6 @@ namespace uavision
 
 	void createPreview(){
 		cv::resize(rgb,preview,cv::Size(),DOWNSIZE,DOWNSIZE,cv::INTER_NEAREST);
-
 		if (VIEW){
 			cv::imshow("Camera Viewer",preview);
 			cv::waitKey(FRAME_MS);
@@ -44,7 +42,6 @@ namespace uavision
 	}
 
 	void compressPreview(std::vector<unsigned char> &jpgbufr){
-		std::cout << "Compressing preview into jpeg" << std::endl;		
 		cv::imencode(".jpg",preview,jpgbufr,jpg_params);
 	}
 }

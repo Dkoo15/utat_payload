@@ -10,7 +10,7 @@
 #define FRAME_MS 1000
 #define JPEG_QUAL 90
 #define VIEW true
-#define RECORD false
+#define RECORD true
 
 namespace uavision{
 	

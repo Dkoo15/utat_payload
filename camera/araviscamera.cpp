@@ -27,7 +27,7 @@ bool AravisCam::initCamSetting(){
 
 //Apply setting and display to confirm
 	for  (std::vector<std::string>::size_type i = 0; i != settings.size(); i++){
-		feature = arv_device_get_feature(device,settings[i].c_str());
+		feature = arv_gc_get_node(genicam,settings[i].c_str());
 
 		if (ARV_IS_GC_FEATURE_NODE (feature)) {
 			if (ARV_IS_GC_COMMAND (feature)) std::cout<< settings[i] << " is a command" <<std::endl;
@@ -55,6 +55,8 @@ bool AravisCam::initCamSetting(){
 				}
 			}
 		}
+		else
+			std::cout<<settings[i]<<" is not a node!"<<std::endl;
 	}
 
 	feature = arv_gc_get_node (genicam, "PayloadSize");
