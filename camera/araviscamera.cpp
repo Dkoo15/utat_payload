@@ -136,7 +136,7 @@ void AravisCam::endCam(){
 }
 
 bool AravisCam::parseInputs(std::vector<std::string> &commands){
-	std::ifstream cfgstream("teledyne.cfg", std::ifstream::in);
+	std::ifstream cfgstream(CONFIG_FILE, std::ifstream::in);
 	std::string word;
 	bool cfg_ok = false;
 

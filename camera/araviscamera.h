@@ -9,6 +9,7 @@ extern "C"{
 
 #define BUFFER_Q_SIZE 5
 #define WAIT_CYCLES 25
+#define CONFIG_FILE "teledyne.cfg"
 
 class AravisCam: public Uavcam {
 
