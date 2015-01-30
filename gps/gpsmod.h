@@ -1,5 +1,4 @@
 #include "libgpsmm.h"
-#include <iostream>
 
 #define GPS_WAIT_US 750000
 

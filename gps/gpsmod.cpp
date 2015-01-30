@@ -16,8 +16,6 @@ namespace gps{
 	bool getGPS(double (&loc)[4]){
 		struct gps_data_t* newdata;
 		
-		std::cout<<"Polling GPS..."<<std::endl;
-		
 		if(!uavgps->waiting(GPS_WAIT_US)) return false;
 			
 		if((newdata = uavgps->read()) == NULL) return false;

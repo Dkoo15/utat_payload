@@ -3,6 +3,7 @@ install (TARGETS utxPayload DESTINATION /Users/davidkoo/uav/)
 
 include_directories( ../camera/)
 include_directories(../vision/)
+include_directories(../gps/)
 
 #Linked Libraries
 target_link_libraries(utxPayload uavcam)
