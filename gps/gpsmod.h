@@ -1,6 +1,11 @@
+#include "libgpsmm.h"
+#include <iostream>
+
+#define GPS_WAIT_US 750000
+
 namespace gps{
 
 	bool startGPS();
-	double[] getGPS();
+	bool getGPS(double (&loc)[4]);
 
 }
