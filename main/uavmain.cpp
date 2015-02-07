@@ -58,10 +58,12 @@ int checkLogInit(){
 void writeLine(std::ofstream &logstream){
 	logstream<<PREFIX;
 	logstream<<std::setfill('0')<<std::setw(4)<<ip;
-	logstream<< ".jpg" <<"\t";
+	logstream<< ".jpg" <<"\t\t";
+	logstream<<std::setprecision(8);
 	logstream<< location[0]<<"\t";
+	logstream<<std::setprecision(8);
 	logstream<< location[1]<<"\t";
-	logstream<< location[2]<<"\t";
+	logstream<< location[2]<<"\t\t";
 	logstream<< location[3]<<"\t";
 	logstream << std::endl;
 }
@@ -92,14 +94,20 @@ void imageWriter(){
 
 void gpsPoller(){
 	std::unique_lock<std::mutex> lock(mtx);
+	bool gps_ok;
+
 	while(1){ //repeat
 		while( stop_work == false && request_gps == false) convar.wait(lock);//Wait for work
 
 		std::cout<<"GPS Thread Awoken"<<std::endl;
 		if(stop_work) break;	//If finish signal is given, skip and leave;
 	
-		gps::getGPS(location);
-	   	request_gps = false;	
+		gps_ok = gps::getGPS(location);
+
+	   	if(gps_ok == false)  std::cout<<"GPS data not good"<<std::endl;
+		else	std::cout<<"Lat" << location[0] << ", Lon" <<location[1]<<std::endl;
+
+		request_gps = false;	
 	}
 	std::cout<<"GPS Thread Done"<<std::endl;
 }
@@ -133,7 +141,7 @@ int main(){
 	
 	//Begin Threads
 	std::thread image_save_thrd(imageWriter);
-	//std::thread gps_poll_thrd(gpsPoller);
+	std::thread gps_poll_thrd(gpsPoller);
 
 	//Set Signals
 	std::signal(SIGINT,exit_signal); 	//Set up ctrl+c signal
@@ -148,7 +156,7 @@ int main(){
 	num_saved = checkLogInit();
 	gpstream.open("save/uav_gps.log",std::ofstream::app);
 	if (num_saved == -1){
-		gpstream <<"Image File Name \t Latitude \t Longitude \t Altitude \t Heading" << std::endl;
+		gpstream <<"Image File Name \tLatitude \tLongitude \tHeading \tAltitude" << std::endl;
 		num_saved++;
 	}
 	ip = num_saved;	
@@ -174,15 +182,13 @@ int main(){
 			while(!finish){  //--Main Acquisition Loop
 				camera->sendTrigger();
 				buffer_ok = camera->getBuffer(rawbuf);
-				//wakeThread(ACQUIRE_GPS)
-				//
+				wakeThread(ACQUIRE_GPS);
 				if(buffer_ok){ //Acquired Image
 					ip++;
 					uavision::processRaw(rawbuf);
 					wakeThread(SAVE_IMAGE);
 					uavision::createPreview();
 					//uavision::compressPreview(jpgbuffer);
-					gps_ok = gps::getGPS(location);
 					writeLine(gpstream);
 				}
 			}
@@ -193,7 +199,7 @@ int main(){
 	stop_work = true;
 	wakeThread(-1);
 	image_save_thrd.join();
-	//gps_poll_thrd.join();
+	gps_poll_thrd.join();
 	gpstream.close();
 
 	delete camera;
