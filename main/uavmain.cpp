@@ -19,10 +19,12 @@
 
 //Preprocessor flags
 #define USE_CAMERA false
+#define RECORD_IMAGE true
+
+//Constants
 #define ACQUIRE_GPS 1
 #define SAVE_IMAGE 2
 #define STREAM_IMAGE 3
-
 #define PREFIX "uav/save/im"
 
 volatile std::sig_atomic_t finish = 0;
@@ -85,7 +87,11 @@ void imageWriter(){
 		ss<<PREFIX;
 		ss<<std::setfill('0')<<std::setw(4)<<ip;
 		ss<<".jpg";
-		uavision::saveFullImage(ss.str());
+
+		if(RECORD_IMAGE) {
+		       	uavision::saveFullImage(ss.str());
+		}
+
 		ss.str("");
 	   	write_img = false;	
 	}

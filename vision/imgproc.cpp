@@ -11,7 +11,6 @@ namespace uavision
 	bool saveFullImage(std::string imagename){ 	//This function will be called form a separate thread
 		bool iswritten;
 		if (!rgb.data) return false;
-		if (!RECORD) return false;
 
 		iswritten = cv::imwrite(imagename, rgb, jpg_params); //Average Time ~300 ms
 		std::cout <<"Saved image to file " << imagename << std::endl;
