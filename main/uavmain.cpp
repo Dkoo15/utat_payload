@@ -23,7 +23,7 @@
 #define SAVE_IMAGE 2
 #define STREAM_IMAGE 3
 
-#define PREFIX "save/im"
+#define PREFIX "uav/save/im"
 
 volatile std::sig_atomic_t finish = 0;
 std::mutex mtx;
@@ -38,7 +38,7 @@ uavimage impacket;
 
 int checkLogInit(){
 	int saved = 0;
-	std::ifstream logstream ("save/uav_gps.log", std::ifstream::in);
+	std::ifstream logstream ("uav/save/uav_gps.log", std::ifstream::in);
 	
 	if(!logstream){
 		std::cout << "Starting from scratch" << std::endl;
@@ -154,7 +154,7 @@ int main(){
 
 	//Check log and start numbering
 	num_saved = checkLogInit();
-	gpstream.open("save/uav_gps.log",std::ofstream::app);
+	gpstream.open("uav/save/uav_gps.log",std::ofstream::app);
 	if (num_saved == -1){
 		gpstream <<"Image File Name \tLatitude \tLongitude \tHeading \tAltitude" << std::endl;
 		num_saved++;

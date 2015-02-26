@@ -28,7 +28,7 @@ bool Imgfromfile::getBuffer(std::vector<unsigned char> &buffer){
 
 	if(i > n)   i = 0;
 	
-	ss << "scratch/img00" <<i;
+	ss << "uav/scratch/img00" <<i;
 	filename = ss.str();
 	i++;
 	bufferfile.open(filename,std::ifstream::binary);
