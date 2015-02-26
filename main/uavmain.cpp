@@ -60,7 +60,7 @@ int checkLogInit(){
 void writeLine(std::ofstream &logstream){
 	logstream<<PREFIX;
 	logstream<<std::setfill('0')<<std::setw(4)<<ip;
-	logstream<< ".jpg" <<"\t\t";
+	logstream<< ".jpg" <<"\t";
 	logstream<<std::setprecision(8);
 	logstream<< location[0]<<"\t";
 	logstream<<std::setprecision(8);
