@@ -5,17 +5,17 @@ namespace uavision
         cv::Mat raw;
         cv::Mat rgb;
         cv::Mat preview;
+	cv::Mat wb;
         std::vector<int> jpg_params;
 	cv::Size size;
 
-	bool saveFullImage(std::string imagename){ 	//This function will be called form a separate thread
+	void saveFullImage(std::string imagename){ 	//This function will be called form a separate thread
 		bool iswritten;
-		if (!rgb.data) return false;
+		if (!rgb.data) return;
 
 		iswritten = cv::imwrite(imagename, rgb, jpg_params); //Average Time ~300 ms
 		std::cout <<"Saved image to file " << imagename << std::endl;
 
-		return iswritten;
 	}
 
 
@@ -42,5 +42,14 @@ namespace uavision
 
 	void compressPreview(std::vector<unsigned char> &jpgbufr){
 		cv::imencode(".jpg",preview,jpgbufr,jpg_params);
+	}
+
+	void whiteBalance(){
+		cv::Scalar m = cv::mean(preview);
+		double a, B;
+		a = m.val[1]/m.val[0];
+		B = m.val[1]/m.val[2];
+		cv::Scalar gain = cv::Scalar(a,1.0,B);
+		wb = preview.mul(gain);
 	}
 }

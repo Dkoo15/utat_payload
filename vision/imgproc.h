@@ -19,7 +19,9 @@ namespace uavision{
 	void createPreview();
 	void compressPreview(std::vector<unsigned char> &jpgbufr);
 
-	bool saveFullImage(std::string imagename);
+	void whiteBalance();
+
+	void saveFullImage(std::string imagename);
 
 }
 

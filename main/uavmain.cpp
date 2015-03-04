@@ -10,6 +10,8 @@
 #include <mutex>
 #include <condition_variable>
 
+#include <sys/time.h>
+
 //Project header files
 #include "araviscamera.h" 
 #include "fakecamera.h"
@@ -19,6 +21,7 @@
 
 //Preprocessor flags
 #define USE_CAMERA false
+#define USE_GPS false
 #define RECORD_IMAGE true
 
 //Constants
@@ -88,9 +91,8 @@ void imageWriter(){
 		ss<<std::setfill('0')<<std::setw(4)<<ip;
 		ss<<".jpg";
 
-		if(RECORD_IMAGE) {
+		if(RECORD_IMAGE) 
 		       	uavision::saveFullImage(ss.str());
-		}
 
 		ss.str("");
 	   	write_img = false;	
@@ -100,15 +102,16 @@ void imageWriter(){
 
 void gpsPoller(){
 	std::unique_lock<std::mutex> lock(mtx);
-	bool gps_ok;
+	bool gps_ok = false;
 
 	while(1){ //repeat
 		while( stop_work == false && request_gps == false) convar.wait(lock);//Wait for work
 
 		std::cout<<"GPS Thread Awoken"<<std::endl;
 		if(stop_work) break;	//If finish signal is given, skip and leave;
-	
-		gps_ok = gps::getGPS(location);
+
+		if(USE_GPS)	
+			gps_ok = gps::getGPS(location);
 
 	   	if(gps_ok == false)  std::cout<<"GPS data not good"<<std::endl;
 		else	std::cout<<"Lat" << location[0] << ", Lon" <<location[1]<<std::endl;
@@ -176,6 +179,9 @@ int main(){
 	rawbuf.resize(camera->payload);
 	uavision::initialize(camera->dim);
 
+	struct timeval st, end;
+	double delta;
+
 	//Start Camera!
 	if (camera_ok) {
 		std::cout << "Start camera acquisition? (y/n)" << std::endl;
@@ -191,7 +197,14 @@ int main(){
 				wakeThread(ACQUIRE_GPS);
 				if(buffer_ok){ //Acquired Image
 					ip++;
+
 					uavision::processRaw(rawbuf);
+					
+					gettimeofday(&st,NULL);
+					uavision::whiteBalance();
+					gettimeofday(&end,NULL);
+					delta =(end.tv_usec-st.tv_usec)/1000;
+					std::cout<<"White Balance Time: " <<delta<<"ms"<<std::endl;
 					wakeThread(SAVE_IMAGE);
 					uavision::createPreview();
 					//uavision::compressPreview(jpgbuffer);
