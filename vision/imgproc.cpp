@@ -5,7 +5,7 @@ namespace uavision
         cv::Mat raw;
         cv::Mat rgb;
         cv::Mat preview;
-	cv::Mat wb;
+	cv::Mat chan[3];
         std::vector<int> jpg_params;
 	cv::Size size;
 
@@ -29,6 +29,7 @@ namespace uavision
 
 	void createPreview(){
 		cv::resize(rgb,preview,cv::Size(),DOWNSIZE,DOWNSIZE,cv::INTER_NEAREST);
+//		cv::resize(wb,preview,cv::Size(),DOWNSIZE,DOWNSIZE,cv::INTER_NEAREST);
 		if (VIEW){
 			cv::imshow("Camera Viewer",preview);
 			cv::waitKey(FRAME_MS);
@@ -38,6 +39,7 @@ namespace uavision
 	void processRaw(std::vector<unsigned char> &rawbuffer){	
 		raw = cv::Mat(size,CV_8UC1,&rawbuffer[0]);
 		cv::cvtColor(raw,rgb,CV_BayerGB2RGB);	//Average Time = ~15 ms 
+		whiteBalance();
 	}
 
 	void compressPreview(std::vector<unsigned char> &jpgbufr){
@@ -45,11 +47,11 @@ namespace uavision
 	}
 
 	void whiteBalance(){
-		cv::Scalar m = cv::mean(preview);
-		double a, B;
-		a = m.val[1]/m.val[0];
-		B = m.val[1]/m.val[2];
-		cv::Scalar gain = cv::Scalar(a,1.0,B);
-		wb = preview.mul(gain);
+		double r, b;
+
+		cv::Scalar m = cv::mean(rgb);
+		r = m.val[1]/m.val[0];
+		b = m.val[1]/m.val[2];
+		rgb = rgb.mul(cv::Scalar(r,1.0,b));
 	}
 }

@@ -20,7 +20,7 @@
 #include "gpsmod.h"
 
 //Preprocessor flags
-#define USE_CAMERA false
+#define USE_CAMERA true
 #define USE_GPS false
 #define RECORD_IMAGE true
 
@@ -198,13 +198,11 @@ int main(){
 				if(buffer_ok){ //Acquired Image
 					ip++;
 
-					uavision::processRaw(rawbuf);
-					
 					gettimeofday(&st,NULL);
-					uavision::whiteBalance();
+					uavision::processRaw(rawbuf);
 					gettimeofday(&end,NULL);
-					delta =(end.tv_usec-st.tv_usec)/1000;
-					std::cout<<"White Balance Time: " <<delta<<"ms"<<std::endl;
+					delta = (end.tv_sec-st.tv_sec)*1000+(end.tv_usec-st.tv_usec)/1000;
+					std::cout<<"Raw Process: " <<delta<<"ms"<<std::endl;
 					wakeThread(SAVE_IMAGE);
 					uavision::createPreview();
 					//uavision::compressPreview(jpgbuffer);
