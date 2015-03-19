@@ -20,7 +20,7 @@
 #include "gpsmod.h"
 
 //Preprocessor flags
-#define USE_CAMERA false
+#define USE_CAMERA true
 #define USE_GPS false
 #define RECORD_IMAGE false
 

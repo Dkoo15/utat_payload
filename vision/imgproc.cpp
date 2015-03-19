@@ -39,7 +39,9 @@ namespace uavision
 	void processRaw(std::vector<unsigned char> &rawbuffer){	
 		raw = cv::Mat(size,CV_8UC1,&rawbuffer[0]);
 		cv::cvtColor(raw,rgb,CV_BayerGB2RGB);	//Average Time = ~15 ms 
-		whiteBalance();
+
+		if (USE_WHITE_BALANCE)
+			whiteBalance();
 	}
 
 	void compressPreview(std::vector<unsigned char> &jpgbufr){
