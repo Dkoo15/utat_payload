@@ -7,13 +7,13 @@ Imgfromfile:: ~Imgfromfile(){}
 bool Imgfromfile::initCamSetting(){
 	dim[0] = 4096; dim[1] = 3072;
 	payload = 12582912;
-	i = 0;
-	n = 5;
+	i = 1;
+	n = 3;
 	return true;
 }
 
 void Imgfromfile::startCam(){
-	std::cout << "Reading pictures from scratch/" << std::endl;
+	std::cout << "Reading pictures from saved buffers/" << std::endl;
 }
 
 void Imgfromfile::sendTrigger(){
@@ -26,9 +26,9 @@ bool Imgfromfile::getBuffer(std::vector<unsigned char> &buffer){
 	std::stringstream ss;
 	std::string filename;
 
-	if(i > n)   i = 0;
+	if(i > n)   i = 1;
 	
-	ss << "uav/scratch/img00" <<i;
+	ss << "uav/utat_payload/camera/stockbuffers/img00" <<i;
 	filename = ss.str();
 	i++;
 	bufferfile.open(filename,std::ifstream::binary);

@@ -10,8 +10,6 @@
 #include <mutex>
 #include <condition_variable>
 
-#include <sys/time.h>
-
 //Project header files
 #include "araviscamera.h" 
 #include "fakecamera.h"
@@ -20,7 +18,7 @@
 #include "gpsmod.h"
 
 //Preprocessor flags
-#define USE_CAMERA true
+#define USE_CAMERA false
 #define USE_GPS false
 #define RECORD_IMAGE false
 
@@ -179,9 +177,6 @@ int main(){
 	rawbuf.resize(camera->payload);
 	uavision::initialize(camera->dim);
 
-	struct timeval st, end;
-	double delta;
-
 	//Start Camera!
 	if (camera_ok) {
 		std::cout << "Start camera acquisition? (y/n)" << std::endl;
@@ -197,12 +192,7 @@ int main(){
 				wakeThread(ACQUIRE_GPS);
 				if(buffer_ok){ //Acquired Image
 					ip++;
-
-					gettimeofday(&st,NULL);
 					uavision::processRaw(rawbuf);
-					gettimeofday(&end,NULL);
-					delta = (end.tv_sec-st.tv_sec)*1000+(end.tv_usec-st.tv_usec)/1000;
-					std::cout<<"Raw Process: " <<delta<<"ms"<<std::endl;
 					wakeThread(SAVE_IMAGE);
 					uavision::createPreview();
 					//uavision::compressPreview(jpgbuffer);

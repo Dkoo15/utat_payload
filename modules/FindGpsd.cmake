@@ -37,6 +37,7 @@ FIND_LIBRARY(LIBGPS_LIBRARY
 	gpsd.21.0.0
         PATHS
 	/usr/local/lib	
+	/usr/local/bin
 )
 
 # handle the QUIETLY and REQUIRED arguments and set LIBGPS_FOUND to TRUE if 

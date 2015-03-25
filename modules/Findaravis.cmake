@@ -24,6 +24,7 @@ find_library(aravis_LIBRARY
 	PATHS 
 	${aravis_PKGCONF_LIBRARY_DIRS}
 	/usr/local/lib
+	/usr/local/bin
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
