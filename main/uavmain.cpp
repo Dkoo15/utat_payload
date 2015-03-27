@@ -7,6 +7,7 @@
 
 #include <csignal>
 #include <thread>
+#include <chrono>
 #include <mutex>
 #include <condition_variable>
 
@@ -26,6 +27,7 @@
 #define ACQUIRE_GPS 1
 #define SAVE_IMAGE 2
 #define STREAM_IMAGE 3
+#define START_DELAY 5
 #define PREFIX "uav/save/im"
 
 volatile std::sig_atomic_t finish = 0;
@@ -141,7 +143,6 @@ int main(){
 	Uavcam *camera; 
 	std::vector<unsigned char> rawbuf;
 	std::vector<unsigned char> jpgbuffer;
-	char start;
  	bool camera_ok, buffer_ok, gps_ok;
 	int num_saved;
 	std::ofstream gpstream;
@@ -179,28 +180,24 @@ int main(){
 
 	//Start Camera!
 	if (camera_ok) {
-		std::cout << "Start camera acquisition? (y/n)" << std::endl;
-		std::cin >> start;
-		
-		if (start == 'y'){ 	//---Start Acquisition
+		std::cout << "Start camera acquisition in " << START_DELAY << " seconds" << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(START_DELAY));	
+		camera->startCam();
 
-			camera->startCam();
-
-			while(!finish){  //--Main Acquisition Loop
-				camera->sendTrigger();
-				buffer_ok = camera->getBuffer(rawbuf);
-				wakeThread(ACQUIRE_GPS);
-				if(buffer_ok){ //Acquired Image
-					ip++;
-					uavision::processRaw(rawbuf);
-					wakeThread(SAVE_IMAGE);
-					uavision::createPreview();
-					//uavision::compressPreview(jpgbuffer);
-					writeLine(gpstream);
-				}
+		while(!finish){  //--Main Acquisition Loop
+			camera->sendTrigger();
+			buffer_ok = camera->getBuffer(rawbuf);
+			wakeThread(ACQUIRE_GPS);
+			if(buffer_ok){ //Acquired Image
+				ip++;
+				uavision::processRaw(rawbuf);
+				wakeThread(SAVE_IMAGE);
+				uavision::createPreview();
+				//uavision::compressPreview(jpgbuffer);
+				writeLine(gpstream);
 			}
-			camera->endCam();
 		}
+		camera->endCam();
 	}
 
 	stop_work = true;

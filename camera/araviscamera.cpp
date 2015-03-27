@@ -25,7 +25,7 @@ bool AravisCam::initCamSetting(){
 	std::cout<< "Found "<< arv_get_device_id(0) << std::endl;
 	genicam = arv_device_get_genicam(device);
 
-//Apply setting and display to confirm
+/*Apply setting and display to confirm
 	for  (std::vector<std::string>::size_type i = 0; i != settings.size(); i++){
 		feature = arv_gc_get_node(genicam,settings[i].c_str());
 
@@ -58,7 +58,7 @@ bool AravisCam::initCamSetting(){
 		else
 			std::cout<<settings[i]<<" is not a node!"<<std::endl;
 	}
-
+*/
 	feature = arv_gc_get_node (genicam, "PayloadSize");
 	payload = arv_gc_integer_get_value (ARV_GC_INTEGER (feature), NULL);
 	std::cout<< "PayloadSize = " << payload << std::endl;
