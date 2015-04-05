@@ -9,7 +9,7 @@
 #define DOWNSIZE 0.25
 #define FRAME_MS 800
 #define JPEG_QUAL 90
-#define USE_WHITE_BALANCE true
+#define USE_WHITE_BALANCE false
 #define VIEW true
 
 namespace uavision{

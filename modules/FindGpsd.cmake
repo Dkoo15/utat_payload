@@ -33,11 +33,11 @@ FIND_PATH(LIBGPS_INCLUDE_DIR
 
 FIND_LIBRARY(LIBGPS_LIBRARY 
 	NAMES 
-	gps.20.0.0
-	gpsd.21.0.0
+	gps
+	gpsd
         PATHS
 	/usr/local/lib	
-	/usr/local/bin
+	/usr/lib/arm-linux-gnueabihf/
 )
 
 # handle the QUIETLY and REQUIRED arguments and set LIBGPS_FOUND to TRUE if 

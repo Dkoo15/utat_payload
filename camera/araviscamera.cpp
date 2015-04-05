@@ -1,4 +1,5 @@
 #include "araviscamera.h"
+#include <cstring>
 
 AravisCam::AravisCam(){}
 
@@ -9,10 +10,9 @@ bool AravisCam::initCamSetting(){
 	std::vector<std::string> settings; 
 	GType value_type;
 	bool config_ok;
-
-//  Initial Setup - Read config and find the Camera	
+/*  Initial Setup - Read config and find the Camera	
 	config_ok = parseInputs(settings);
-	if(!config_ok) return false;
+	if(!config_ok) return false; */
 	
 	std::cout<<"Looking for the Camera...\n";
 	device = arv_open_device(NULL);

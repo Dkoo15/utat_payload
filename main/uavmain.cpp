@@ -19,7 +19,7 @@
 #include "gpsmod.h"
 
 //Preprocessor flags
-#define USE_CAMERA false
+#define USE_CAMERA true
 #define USE_GPS false
 #define RECORD_IMAGE false
 
@@ -175,11 +175,11 @@ int main(){
 		
 	//Initialize Camera Settings
 	camera_ok = camera->initCamSetting();
-	rawbuf.resize(camera->payload);
-	uavision::initialize(camera->dim);
-
+	
 	//Start Camera!
 	if (camera_ok) {
+		rawbuf.resize(camera->payload);
+        	uavision::initialize(camera->dim);
 		std::cout << "Start camera acquisition in " << START_DELAY << " seconds" << std::endl;
 		std::this_thread::sleep_for(std::chrono::seconds(START_DELAY));	
 		camera->startCam();

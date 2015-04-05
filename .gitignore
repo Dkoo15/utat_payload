@@ -10,6 +10,7 @@ main/.deps/
 camera/CMakeFiles/
 imgproc/CMakeFiles/
 main/Makefile
+camera/Makefile
 main/CmakeFiles/
 Cmakefiles/
 install_manifest.txt
