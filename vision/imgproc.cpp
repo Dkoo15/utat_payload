@@ -20,28 +20,28 @@ namespace uavision
 	}
 
 
-	void initialize(int dim[2]){
+	void initialize(int w, int h, bool view, int qual){
 		jpg_params.push_back(CV_IMWRITE_JPEG_QUALITY);
-		jpg_params.push_back(JPEG_QUAL);
-		size = cv::Size(dim[0], dim[1]);
-		total = dim[0]*dim[1];
-		if (VIEW) cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);
+		jpg_params.push_back(qual);
+		size = cv::Size(w, h);
+		total = w*h;
+		if (view) cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);
 	}
 
-	void createPreview(){
-		cv::resize(rgb,preview,cv::Size(),DOWNSIZE,DOWNSIZE,cv::INTER_NEAREST);
-		if (VIEW){
-			cv::imshow("Camera Viewer",preview);
-			cv::waitKey(FRAME_MS);
-		}
+	void createPreview(int fac){
+		double downsize = double(1/double(fac));
+		cv::resize(rgb,preview,cv::Size(),downsize,downsize,cv::INTER_NEAREST);
+	}
+
+	void openViewer(int delay){
+		cv::imshow("Camera Viewer",preview);
+		cv::waitKey(delay*1000);
 	}
 
 	void processRaw(std::vector<unsigned char> &rawbuffer){	
 		raw = cv::Mat(size,CV_8UC1,&rawbuffer[0]);
 		cv::cvtColor(raw,rgb,CV_BayerGB2RGB);	//Average Time = ~15 ms 
-
-		if (USE_WHITE_BALANCE)
-			whiteBalance();
+		//whiteBalance();
 	}
 
 	void compressPreview(std::vector<unsigned char> &jpgbufr){

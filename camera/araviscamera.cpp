@@ -1,6 +1,15 @@
 #include "araviscamera.h"
+#include <cstring>
 
-AravisCam::AravisCam(){}
+AravisCam::AravisCam(int b, int t){
+	bufferq = b;
+	timeout = t;
+}
+
+AravisCam::AravisCam(){
+	timeout = 10;
+	bufferq = 5;
+}
 
 AravisCam:: ~AravisCam(){}
 
@@ -10,9 +19,7 @@ bool AravisCam::initCamSetting(){
 	GType value_type;
 	bool config_ok;
 
-//  Initial Setup - Read config and find the Camera	
-	config_ok = parseInputs(settings);
-	if(!config_ok) return false;
+//  Initial Setup - Find the Camera	
 	
 	std::cout<<"Looking for the Camera...\n";
 	device = arv_open_device(NULL);
@@ -66,7 +73,7 @@ bool AravisCam::initCamSetting(){
 	//Create Stream and fill buffer queue
 	stream = arv_device_create_stream (device, NULL, NULL);
 
-        for (int i = 0; i < BUFFER_Q_SIZE; i++)
+        for (int i = 0; i < bufferq; i++)
 		arv_stream_push_buffer (stream, arv_buffer_new (payload, NULL));
 	
 	//Get and save the node that is the software trigger
@@ -110,9 +117,9 @@ bool AravisCam::getBuffer(std::vector<unsigned char> &buffer){
 				arv_stream_push_buffer (stream, arvbufr);
 			}		 
 		} while (arvbufr != NULL && !snapped);
-	}while(cycles < WAIT_CYCLES && !snapped);
+	}while(cycles < timeout && !snapped);
 
-	if (cycles >= WAIT_CYCLES)	
+	if (cycles >= timeout)	
 		return false;
 	else 	
 		return true;
@@ -135,20 +142,3 @@ void AravisCam::endCam(){
 	g_object_unref (device);
 }
 
-bool AravisCam::parseInputs(std::vector<std::string> &commands){
-	std::ifstream cfgstream(CONFIG_FILE, std::ifstream::in);
-	std::string word;
-	bool cfg_ok = false;
-
-	if(!cfgstream) return cfg_ok;
-
-	if(cfgstream >> dim[0] && cfgstream >> dim[1]){
-		std::getline(cfgstream,word);
-		while(std::getline(cfgstream,word)) 
-			commands.push_back(word);	
-		cfg_ok = true;
-	}
-
-	cfgstream.close();
-	return cfg_ok;
-}

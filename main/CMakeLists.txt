@@ -1,4 +1,4 @@
-add_executable(utxPayload uavmain.cpp)
+add_executable(utxPayload io_mod.cpp uavmain.cpp)
 install (TARGETS utxPayload DESTINATION /usr/local/bin/)
 
 include_directories( ../camera/)

@@ -13,6 +13,6 @@ class Uavcam {
 		virtual bool getBuffer(std::vector<unsigned char> &buffer) = 0;
 		virtual void endCam() = 0;
 
-		int payload, dim[2];
+		int payload;
 
 };

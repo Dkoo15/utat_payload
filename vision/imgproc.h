@@ -6,18 +6,13 @@
 #include <iostream>
 #include <fstream>
 
-#define DOWNSIZE 0.25
-#define FRAME_MS 800
-#define JPEG_QUAL 90
-#define USE_WHITE_BALANCE true
-#define VIEW true
-
 namespace uavision{
 	
-	void initialize(int dim[2]);
+	void initialize(int, int, bool, int);
 	
 	void processRaw(std::vector<unsigned char> &rawbuffer); 
-	void createPreview();
+	void createPreview(int fac);
+	void openViewer(int delay);
 	void compressPreview(std::vector<unsigned char> &jpgbufr);
 
 	void whiteBalance();

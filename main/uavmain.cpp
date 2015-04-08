@@ -1,10 +1,4 @@
 //Standard Libraries
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <iomanip>
-
 #include <csignal>
 #include <thread>
 #include <chrono>
@@ -15,63 +9,29 @@
 #include "araviscamera.h" 
 #include "fakecamera.h"
 #include "imgproc.h"
-#include "imagepacket.h"
 #include "gpsmod.h"
-
-//Preprocessor flags
-#define USE_CAMERA false
-#define USE_GPS false
-#define RECORD_IMAGE false
+#include "io_mod.h"
 
 //Constants
 #define ACQUIRE_GPS 1
 #define SAVE_IMAGE 2
 #define STREAM_IMAGE 3
-#define START_DELAY 5
 #define PREFIX "uav/save/im"
 
 volatile std::sig_atomic_t finish = 0;
 std::mutex mtx;
 std::condition_variable convar;
 bool write_img = false;
-bool stream_packet = false;;
+bool packet = false;;
 bool request_gps = false;
 bool stop_work = false;
+int width, height;
+int usecamera, usegps, saveimg, view;
+int sizefac, jpgq;
+int bufferq, timeout;
+int start_delay, delay;
 double location[4];
-int ip; 
-uavimage impacket;
-
-int checkLogInit(){
-	int saved = 0;
-	std::ifstream logstream ("uav/save/uav_gps.log", std::ifstream::in);
-	
-	if(!logstream){
-		std::cout << "Starting from scratch" << std::endl;
-		return -1;
-		}
-	else {
-		std::string line;
-		if (std::getline(logstream,line)){
-			while(std::getline(logstream,line))  saved++;
-		}
-		logstream.close();
-		std::cout << "Starting after " << saved << " images" << std::endl;
-	    }
-	return saved;
-}
-
-void writeLine(std::ofstream &logstream){
-	logstream<<PREFIX;
-	logstream<<std::setfill('0')<<std::setw(4)<<ip;
-	logstream<< ".jpg" <<"\t";
-	logstream<<std::setprecision(8);
-	logstream<< location[0]<<"\t";
-	logstream<<std::setprecision(8);
-	logstream<< location[1]<<"\t";
-	logstream<< location[2]<<"\t\t";
-	logstream<< location[3]<<"\t";
-	logstream << std::endl;
-}
+int ip;
 
 void exit_signal(int param){
 	finish  = 1;
@@ -84,14 +44,13 @@ void imageWriter(){
 	while(1){ //repeat
 		while( stop_work == false && write_img == false) convar.wait(lock);//Wait for work
 
-		std::cout<<"Image Thread Awoken"<<std::endl;
 		if(stop_work) break;	//If finish signal is given, skip and leave;
 	
 		ss<<PREFIX;
 		ss<<std::setfill('0')<<std::setw(4)<<ip;
 		ss<<".jpg";
 
-		if(RECORD_IMAGE) 
+		if(saveimg) 
 		       	uavision::saveFullImage(ss.str());
 
 		ss.str("");
@@ -107,15 +66,15 @@ void gpsPoller(){
 	while(1){ //repeat
 		while( stop_work == false && request_gps == false) convar.wait(lock);//Wait for work
 
-		std::cout<<"GPS Thread Awoken"<<std::endl;
 		if(stop_work) break;	//If finish signal is given, skip and leave;
 
-		if(USE_GPS)	
+		if(usegps){
 			gps_ok = gps::getGPS(location);
 
-	   	if(gps_ok == false)  std::cout<<"GPS data not good"<<std::endl;
-		else	std::cout<<"Lat" << location[0] << ", Lon" <<location[1]<<std::endl;
-
+	   		if(gps_ok == false)  std::cout<<"GPS data not good"<<std::endl;
+			else	std::cout<<"Lat" << location[0] << ", Lon" <<location[1]<<std::endl;
+		}
+		
 		request_gps = false;	
 	}
 	std::cout<<"GPS Thread Done"<<std::endl;
@@ -131,7 +90,7 @@ void wakeThread(int id){
 			write_img = true;
 			break;
 		case STREAM_IMAGE:
-			stream_packet = true;
+			packet = true;
 			break;
 		default:
 			break;
@@ -147,6 +106,7 @@ int main(){
 	int num_saved;
 	std::ofstream gpstream;
 	
+	parseConfig();
 	//Begin Threads
 	std::thread image_save_thrd(imageWriter);
 	std::thread gps_poll_thrd(gpsPoller);
@@ -155,7 +115,7 @@ int main(){
 	std::signal(SIGINT,exit_signal); 	//Set up ctrl+c signal
 
 	//Construct Classes
-	if (!USE_CAMERA)	
+	if (usecamera == false)	
 		camera = new Imgfromfile();
 	else
 		camera = new AravisCam();
@@ -175,13 +135,14 @@ int main(){
 		
 	//Initialize Camera Settings
 	camera_ok = camera->initCamSetting();
-	rawbuf.resize(camera->payload);
-	uavision::initialize(camera->dim);
 
 	//Start Camera!
 	if (camera_ok) {
-		std::cout << "Start camera acquisition in " << START_DELAY << " seconds" << std::endl;
-		std::this_thread::sleep_for(std::chrono::seconds(START_DELAY));	
+		rawbuf.resize(camera->payload);
+		uavision::initialize(width, height, view, jpgq);
+
+		std::cout << "Start camera acquisition in " << start_delay << " seconds" << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(start_delay));	
 		camera->startCam();
 
 		while(!finish){  //--Main Acquisition Loop
@@ -192,8 +153,13 @@ int main(){
 				ip++;
 				uavision::processRaw(rawbuf);
 				wakeThread(SAVE_IMAGE);
-				uavision::createPreview();
+				uavision::createPreview(sizefac);
 				//uavision::compressPreview(jpgbuffer);
+				if(view)
+					uavision::openViewer(delay);
+				else
+					std::this_thread::sleep_for(std::chrono::seconds(delay));
+
 				writeLine(gpstream);
 			}
 		}
