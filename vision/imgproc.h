@@ -15,8 +15,6 @@ namespace uavision{
 	void openViewer(int delay);
 	void compressPreview(std::vector<unsigned char> &jpgbufr);
 
-	void whiteBalance();
-
 	void saveFullImage(std::string imagename);
 
 }

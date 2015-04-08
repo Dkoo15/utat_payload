@@ -7,7 +7,6 @@ namespace uavision
         cv::Mat preview;
         std::vector<int> jpg_params;
 	cv::Size size;
-	cv::Mat channels[3];
 	int total;
 
 	void saveFullImage(std::string imagename){ 	//This function will be called form a separate thread
@@ -46,39 +45,5 @@ namespace uavision
 
 	void compressPreview(std::vector<unsigned char> &jpgbufr){
 		cv::imencode(".jpg",preview,jpgbufr,jpg_params);
-	}
-
-	void whiteBalance(){
-		float r[] = {0,256};
-		int hsize = 256;
-		int j;
-		float n, min, max;
-		float qmin = total*0.05f;
-		float qmax = total*0.95f;
-
-		const float* range = {r};
-		cv::Mat hist;
-
-		cv::split(rgb,channels);
-		for (int i = 0; i<3;i++){
-			cv::calcHist(&channels[i], 1,0, cv::Mat(), hist,1,&hsize,&range );
-			n = 0.0f;
-			j = 0;
-			min = 0.0f;
-			while(n < qmin){
-				n += hist.at<float>(j++);
-				min += 1.0f;
-			}
-
-			n = (float)total;
-			j = hsize;
-			max = 255.0f;
-			while(n > qmax){
-				n -= hist.at<float>(j--);
-				max -= 1.0f;	
-			}
-			channels[i] = (channels[i]-min)*255.0f/(max-min); 
-		}
-		cv::merge(channels,3,rgb);
 	}
 }
