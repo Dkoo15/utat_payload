@@ -98,6 +98,7 @@ bool AravisCam::getBuffer(std::vector<unsigned char> &buffer){
 	ArvBuffer * arvbufr;
 	bool snapped = false;
 	int cycles = 0;
+	std::cout<<"Getting Buffer..."<<std::endl;
 	do {
 		g_usleep (10000);
 		cycles++;
@@ -106,7 +107,7 @@ bool AravisCam::getBuffer(std::vector<unsigned char> &buffer){
 			if (arvbufr != NULL){
 				std::cout<<"Buffer: ";
 				switch(arvbufr->status){
-					case ARV_BUFFER_STATUS_SUCCESS: std::cout<<"buffer success"<<std::endl; break;
+					case ARV_BUFFER_STATUS_SUCCESS: std::cout<<"success"<<std::endl; break;
 					case ARV_BUFFER_STATUS_TIMEOUT: std::cout<<"timeout"<<std::endl; break;
 					default: std::cout<<"error"<<std::endl;;
 				}

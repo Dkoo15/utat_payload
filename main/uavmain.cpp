@@ -146,7 +146,7 @@ int main(){
 		camera->startCam();
 
 		while(!finish){  //--Main Acquisition Loop
-			camera->sendTrigger();
+
 			buffer_ok = camera->getBuffer(rawbuf);
 			wakeThread(ACQUIRE_GPS);
 			if(buffer_ok){ //Acquired Image
