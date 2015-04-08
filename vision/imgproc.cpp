@@ -7,7 +7,6 @@ namespace uavision
         cv::Mat preview;
         std::vector<int> jpg_params;
 	cv::Size size;
-	int total;
 
 	void saveFullImage(std::string imagename){ 	//This function will be called form a separate thread
 		bool iswritten;
@@ -23,7 +22,6 @@ namespace uavision
 		jpg_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 		jpg_params.push_back(qual);
 		size = cv::Size(w, h);
-		total = w*h;
 		if (view) cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);
 	}
 
