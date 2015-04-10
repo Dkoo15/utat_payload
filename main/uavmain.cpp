@@ -124,7 +124,7 @@ int main(){
 	num_saved = checkLogInit();
 	gpstream.open("uav/save/uav_gps.log",std::ofstream::app);
 	if (num_saved == -1){
-		gpstream <<"Image File Name \tLatitude \tLongitude \tHeading \tAltitude" << std::endl;
+		gpstream <<"Image,Latitude[deg],Longitude[deg],Altitude[m],Heading[deg]" << std::endl;
 		num_saved++;
 	}
 	ip = num_saved;	

@@ -87,13 +87,13 @@ int checkLogInit(){
 void writeLine(std::ofstream &logstream){
 	logstream<<"im";
 	logstream<<std::setfill('0')<<std::setw(4)<<ip;
-	logstream<< ".jpg" <<"\t";
+	logstream<< ".jpg" <<",";
 	logstream<<std::setprecision(8);
-	logstream<< location[0]<<"\t";
+	logstream<< location[0]<<",";
 	logstream<<std::setprecision(8);
-	logstream<< location[1]<<"\t";
-	logstream<< location[2]<<"\t\t";
-	logstream<< location[3]<<"\t";
+	logstream<< location[1]<<",";
+	logstream<< location[2]<<",";
+	logstream<< location[3]<<",";
 	logstream << std::endl;
 }
 
