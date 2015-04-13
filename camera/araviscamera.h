@@ -7,8 +7,8 @@ extern "C"{
 #include <fstream>
 #include <string>
 
-#define BUFFER_Q_SIZE 5
-#define WAIT_CYCLES 25
+#define BUFFER_Q_SIZE 25
+#define WAIT_CYCLES 50
 #define CONFIG_FILE "uav/teledyne.cfg"
 
 class AravisCam: public Uavcam {

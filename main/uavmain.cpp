@@ -148,8 +148,8 @@ int main(){
 	std::ofstream gpstream;
 	
 	//Begin Threads
-	std::thread image_save_thrd(imageWriter);
-	std::thread gps_poll_thrd(gpsPoller);
+//	std::thread image_save_thrd(imageWriter);
+//	std::thread gps_poll_thrd(gpsPoller);
 
 	//Set Signals
 	std::signal(SIGINT,exit_signal); 	//Set up ctrl+c signal
@@ -187,23 +187,25 @@ int main(){
 		while(!finish){  //--Main Acquisition Loop
 			camera->sendTrigger();
 			buffer_ok = camera->getBuffer(rawbuf);
-			wakeThread(ACQUIRE_GPS);
+//			wakeThread(ACQUIRE_GPS);
 			if(buffer_ok){ //Acquired Image
 				ip++;
 				uavision::processRaw(rawbuf);
-				wakeThread(SAVE_IMAGE);
+//				wakeThread(SAVE_IMAGE);
 				uavision::createPreview();
 				//uavision::compressPreview(jpgbuffer);
 				writeLine(gpstream);
 			}
+			else{std::this_thread::sleep_for(std::chrono::seconds(1));	}
+
 		}
 		camera->endCam();
 	}
 
 	stop_work = true;
-	wakeThread(-1);
-	image_save_thrd.join();
-	gps_poll_thrd.join();
+//	wakeThread(-1);
+//	image_save_thrd.join();
+//	gps_poll_thrd.join();
 	gpstream.close();
 
 	delete camera;

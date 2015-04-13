@@ -1,7 +1,10 @@
 #include "araviscamera.h"
 #include <cstring>
 
-AravisCam::AravisCam(){}
+AravisCam::AravisCam(){
+dim[0] = 4096;
+dim[1] = 3072;
+}
 
 AravisCam:: ~AravisCam(){}
 
@@ -91,8 +94,9 @@ bool AravisCam::getBuffer(std::vector<unsigned char> &buffer){
 	ArvBuffer * arvbufr;
 	bool snapped = false;
 	int cycles = 0;
+	std::cout<<"Getting Buffer..."<<std::endl;
 	do {
-		g_usleep (10000);
+		g_usleep (100000);
 		cycles++;
 		do  {
 			arvbufr = arv_stream_try_pop_buffer (stream);
@@ -105,6 +109,7 @@ bool AravisCam::getBuffer(std::vector<unsigned char> &buffer){
 				}
 				if (arvbufr->status == ARV_BUFFER_STATUS_SUCCESS){
 					memcpy(&buffer[0],arvbufr->data,payload);
+					
 					snapped = true;			
 				}	 
 				arv_stream_push_buffer (stream, arvbufr);
