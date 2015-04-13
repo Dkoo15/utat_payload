@@ -1,9 +1,14 @@
 #include "araviscamera.h"
 #include <cstring>
 
+AravisCam::AravisCam(int b, int t){
+	bufferq = b;
+	timeout = t;
+}
+
 AravisCam::AravisCam(){
-dim[0] = 4096;
-dim[1] = 3072;
+	timeout = 10;
+	bufferq = 5;
 }
 
 AravisCam:: ~AravisCam(){}
@@ -13,9 +18,8 @@ bool AravisCam::initCamSetting(){
 	std::vector<std::string> settings; 
 	GType value_type;
 	bool config_ok;
-/*  Initial Setup - Read config and find the Camera	
-	config_ok = parseInputs(settings);
-	if(!config_ok) return false; */
+
+//  Initial Setup - Find the Camera	
 	
 	std::cout<<"Looking for the Camera...\n";
 	device = arv_open_device(NULL);
@@ -69,7 +73,7 @@ bool AravisCam::initCamSetting(){
 	//Create Stream and fill buffer queue
 	stream = arv_device_create_stream (device, NULL, NULL);
 
-        for (int i = 0; i < BUFFER_Q_SIZE; i++)
+        for (int i = 0; i < bufferq; i++)
 		arv_stream_push_buffer (stream, arv_buffer_new (payload, NULL));
 	
 	//Get and save the node that is the software trigger
@@ -96,28 +100,27 @@ bool AravisCam::getBuffer(std::vector<unsigned char> &buffer){
 	int cycles = 0;
 	std::cout<<"Getting Buffer..."<<std::endl;
 	do {
-		g_usleep (100000);
+		g_usleep (10000);
 		cycles++;
 		do  {
 			arvbufr = arv_stream_try_pop_buffer (stream);
 			if (arvbufr != NULL){
 				std::cout<<"Buffer: ";
 				switch(arvbufr->status){
-					case ARV_BUFFER_STATUS_SUCCESS: std::cout<<"buffer success"<<std::endl; break;
+					case ARV_BUFFER_STATUS_SUCCESS: std::cout<<"success"<<std::endl; break;
 					case ARV_BUFFER_STATUS_TIMEOUT: std::cout<<"timeout"<<std::endl; break;
 					default: std::cout<<"error"<<std::endl;;
 				}
 				if (arvbufr->status == ARV_BUFFER_STATUS_SUCCESS){
 					memcpy(&buffer[0],arvbufr->data,payload);
-					
 					snapped = true;			
 				}	 
 				arv_stream_push_buffer (stream, arvbufr);
 			}		 
 		} while (arvbufr != NULL && !snapped);
-	}while(cycles < WAIT_CYCLES && !snapped);
+	}while(cycles < timeout && !snapped);
 
-	if (cycles >= WAIT_CYCLES)	
+	if (cycles >= timeout)	
 		return false;
 	else 	
 		return true;
@@ -140,20 +143,3 @@ void AravisCam::endCam(){
 	g_object_unref (device);
 }
 
-bool AravisCam::parseInputs(std::vector<std::string> &commands){
-	std::ifstream cfgstream(CONFIG_FILE, std::ifstream::in);
-	std::string word;
-	bool cfg_ok = false;
-
-	if(!cfgstream) return cfg_ok;
-
-	if(cfgstream >> dim[0] && cfgstream >> dim[1]){
-		std::getline(cfgstream,word);
-		while(std::getline(cfgstream,word)) 
-			commands.push_back(word);	
-		cfg_ok = true;
-	}
-
-	cfgstream.close();
-	return cfg_ok;
-}

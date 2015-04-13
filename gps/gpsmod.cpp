@@ -33,8 +33,8 @@ namespace gps{
 		else{
 			loc[0] = data->fix.latitude;
 			loc[1] = data->fix.longitude;
-			loc[2] = data->fix.track;
-			loc[3] = data->fix.altitude;
+			loc[2] = data->fix.altitude;
+			loc[3] = data->fix.track;
 			return true;
 		}
 		return true;

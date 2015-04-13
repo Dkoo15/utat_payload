@@ -7,14 +7,11 @@ extern "C"{
 #include <fstream>
 #include <string>
 
-#define BUFFER_Q_SIZE 25
-#define WAIT_CYCLES 50
-#define CONFIG_FILE "uav/teledyne.cfg"
-
 class AravisCam: public Uavcam {
 
 	public: 
 		AravisCam();
+		AravisCam(int, int);
 		~AravisCam();	
 		
 		bool initCamSetting();
@@ -22,11 +19,11 @@ class AravisCam: public Uavcam {
 		void sendTrigger();
 		bool getBuffer(std::vector<unsigned char> &buffer);
 		void endCam();
-		bool parseInputs(std::vector<std::string> &commands);;
 
 	private:
 		ArvGc *genicam;
 		ArvDevice *device;
 		ArvStream *stream;
 		ArvGcNode *trigger;
+		int timeout, bufferq;
 };

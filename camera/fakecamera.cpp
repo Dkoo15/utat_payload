@@ -5,7 +5,6 @@ Imgfromfile::Imgfromfile(){}
 Imgfromfile:: ~Imgfromfile(){}
 
 bool Imgfromfile::initCamSetting(){
-	dim[0] = 4096; dim[1] = 3072;
 	payload = 12582912;
 	i = 1;
 	n = 3;
