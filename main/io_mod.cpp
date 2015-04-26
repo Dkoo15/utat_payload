@@ -10,16 +10,8 @@ bool parseConfig(){
 	while(std::getline(cfgstream,param,'=')) {
 		std::getline(cfgstream,num);
 		val = std::stoi(num);
-		if (param.compare("width") ==0){
-			width = val;
-			continue;
-		}		
-		if (param.compare("height") ==0){
-			height = val;
-			continue;
-		}		
-		if (param.compare("usecamera")==0){
-			usecamera = val;
+		if (param.compare("cameratype")==0){
+			cameratype = val;
 			continue;
 		}
 		if (param.compare("usegps")==0){
@@ -44,14 +36,6 @@ bool parseConfig(){
 		}
 		if(param.compare("viewer")==0){
 			view = val;
-			continue;
-		}
-		if(param.compare("bufferq")==0){
-			bufferq = val;
-			continue;
-		}
-		if(param.compare("timeout")==0){
-			timeout = val;
 			continue;
 		}
 		if(param.compare("start_delay")==0){
@@ -93,7 +77,7 @@ void writeLine(std::ofstream &logstream){
 	logstream<<std::setprecision(8);
 	logstream<< location[1]<<",";
 	logstream<< location[2]<<",";
-	logstream<< location[3]<<",";
+	logstream<< location[3];
 	logstream << std::endl;
 }
 

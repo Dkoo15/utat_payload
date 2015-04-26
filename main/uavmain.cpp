@@ -8,6 +8,7 @@
 //Project header files
 #include "araviscamera.h" 
 #include "fakecamera.h"
+#include "webcamera.h"
 #include "imgproc.h"
 #include "gpsmod.h"
 #include "io_mod.h"
@@ -25,8 +26,8 @@ bool write_img = false;
 bool packet = false;;
 bool request_gps = false;
 bool stop_work = false;
-int width, height;
-int usecamera, usegps, saveimg, view;
+bool bayer = false;
+int cameratype, usegps, saveimg, view;
 int sizefac, jpgq;
 int bufferq, timeout;
 int start_delay, delay;
@@ -104,6 +105,7 @@ int main(){
 	std::vector<unsigned char> jpgbuffer;
  	bool camera_ok, buffer_ok, gps_ok;
 	int num_saved;
+	int width, height;
 	std::ofstream gpstream;
 	
 	parseConfig();
@@ -115,10 +117,12 @@ int main(){
 	std::signal(SIGINT,exit_signal); 	//Set up ctrl+c signal
 
 	//Construct Classes
-	if (usecamera == false)	
+	if (cameratype == 0)	
 		camera = new Imgfromfile();
-	else
+	else if (cameratype == 1)
 		camera = new AravisCam();
+	else if (cameratype == 2)
+		camera = new WebCam();
 
 	//Check log and start numbering
 	num_saved = checkLogInit();
@@ -134,7 +138,8 @@ int main(){
 	else		std::cout<<"GPS Error, no georeferencing"<<std::endl;
 		
 	//Initialize Camera Settings
-	camera_ok = camera->initCamSetting();
+	camera_ok = camera->initCamSetting(width, height);
+	std::cout<<"Width = " << width << " Height = " << height << " Payload = "<< camera->payload<<std::endl;
 
 	//Start Camera!
 	if (camera_ok) {
@@ -146,17 +151,24 @@ int main(){
 		camera->startCam();
 
 		while(!finish){  //--Main Acquisition Loop
-
+			camera->sendTrigger();
 			buffer_ok = camera->getBuffer(rawbuf);
 			wakeThread(ACQUIRE_GPS);
 			if(buffer_ok){ //Acquired Image
 				ip++;
-				uavision::processRaw(rawbuf);
+
+				if(cameratype <= 1)
+					uavision::processRaw(rawbuf);
+				else 
+					uavision::assignData(rawbuf);
+
 				wakeThread(SAVE_IMAGE);
-				uavision::createPreview(sizefac);
-				//uavision::compressPreview(jpgbuffer);
-				if(view)
+				
+				if(view){
+					uavision::createPreview(sizefac);
 					uavision::openViewer(delay);
+					//uavision::compressPreview(jpgbuffer)
+				}
 				else
 					std::this_thread::sleep_for(std::chrono::seconds(delay));
 

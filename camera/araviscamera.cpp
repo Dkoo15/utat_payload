@@ -1,19 +1,14 @@
 #include "araviscamera.h"
 #include <cstring>
 
-AravisCam::AravisCam(int b, int t){
-	bufferq = b;
-	timeout = t;
-}
-
 AravisCam::AravisCam(){
-	timeout = 10;
-	bufferq = 5;
+	timeout = 20;
+	bufferq = 10;
 }
 
 AravisCam:: ~AravisCam(){}
 
-bool AravisCam::initCamSetting(){
+bool AravisCam::initCamSetting(int &width, int &height){
 	ArvGcNode *feature;
 	std::vector<std::string> settings; 
 	GType value_type;
@@ -32,43 +27,14 @@ bool AravisCam::initCamSetting(){
 	std::cout<< "Found "<< arv_get_device_id(0) << std::endl;
 	genicam = arv_device_get_genicam(device);
 
-/*Apply setting and display to confirm
-	for  (std::vector<std::string>::size_type i = 0; i != settings.size(); i++){
-		feature = arv_gc_get_node(genicam,settings[i].c_str());
+	feature = arv_gc_get_node(genicam,"Width");
+	width = arv_gc_integer_get_value(ARV_GC_INTEGER (feature), NULL);
+		
+	feature = arv_gc_get_node(genicam,"Height");
+	height = arv_gc_integer_get_value(ARV_GC_INTEGER (feature), NULL);
 
-		if (ARV_IS_GC_FEATURE_NODE (feature)) {
-			if (ARV_IS_GC_COMMAND (feature)) std::cout<< settings[i] << " is a command" <<std::endl;
-			else {
-				//I can't set the feature properly. Use initteledyne
-				//arv_gc_feature_node_set_value_from_string (ARV_GC_FEATURE_NODE (feature), value, NULL);
-				value_type = arv_gc_feature_node_get_value_type (ARV_GC_FEATURE_NODE (feature));
-				std::cout << settings[i] << " = ";
-
-				switch (value_type) { 
-				 case G_TYPE_INT64:
-					std::cout << arv_gc_integer_get_value(ARV_GC_INTEGER(feature),NULL) << std::endl;
-			 	 	break;
-			 	 case G_TYPE_DOUBLE:
-					std::cout << arv_gc_float_get_value(ARV_GC_FLOAT(feature),NULL) << std::endl;
-			 		break;
-				 case G_TYPE_STRING:
-					std::cout << arv_gc_string_get_value(ARV_GC_STRING(feature),NULL) << std::endl;
-					break;
-				 case G_TYPE_BOOLEAN:
-					std::cout << arv_gc_integer_get_value(ARV_GC_INTEGER(feature),NULL) << std::endl;
-					break;
-				 default:
-					std::cout << arv_gc_feature_node_get_value_as_string(ARV_GC_FEATURE_NODE(feature),NULL) << std::endl; 
-				}
-			}
-		}
-		else
-			std::cout<<settings[i]<<" is not a node!"<<std::endl;
-	}
-*/
 	feature = arv_gc_get_node (genicam, "PayloadSize");
 	payload = arv_gc_integer_get_value (ARV_GC_INTEGER (feature), NULL);
-	std::cout<< "PayloadSize = " << payload << std::endl;
 
 	//Create Stream and fill buffer queue
 	stream = arv_device_create_stream (device, NULL, NULL);

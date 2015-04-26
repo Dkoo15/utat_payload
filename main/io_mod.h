@@ -6,8 +6,7 @@
 
 #define CONFIG_FILE "uav/utat_payload/options.cfg"
 
-extern int width, height;
-extern int usecamera, usegps, saveimg, view;
+extern int cameratype, usegps, saveimg, view;
 extern int sizefac, jpgq;
 extern int bufferq, timeout;
 extern int start_delay, delay;

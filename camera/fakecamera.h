@@ -9,7 +9,7 @@ class Imgfromfile: public Uavcam {
 		Imgfromfile();
 		~Imgfromfile();	
 		
-		bool initCamSetting();
+		bool initCamSetting(int &width, int &height);
 		void startCam();
 		void sendTrigger();
 	  	bool getBuffer(std::vector<unsigned char> &buffer);

@@ -11,10 +11,9 @@ class AravisCam: public Uavcam {
 
 	public: 
 		AravisCam();
-		AravisCam(int, int);
 		~AravisCam();	
 		
-		bool initCamSetting();
+		bool initCamSetting(int &width, int &height);
 		void startCam();
 		void sendTrigger();
 		bool getBuffer(std::vector<unsigned char> &buffer);

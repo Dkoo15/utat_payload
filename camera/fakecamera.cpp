@@ -4,7 +4,9 @@ Imgfromfile::Imgfromfile(){}
 
 Imgfromfile:: ~Imgfromfile(){}
 
-bool Imgfromfile::initCamSetting(){
+bool Imgfromfile::initCamSetting(int &width, int &height){
+	width = 4096;
+	height = 3072;
 	payload = 12582912;
 	i = 1;
 	n = 3;

@@ -205,6 +205,30 @@ fakecamera.cpp.s:
 	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/fakecamera.cpp.s
 .PHONY : fakecamera.cpp.s
 
+webcamera.o: webcamera.cpp.o
+.PHONY : webcamera.o
+
+# target to build an object file
+webcamera.cpp.o:
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/webcamera.cpp.o
+.PHONY : webcamera.cpp.o
+
+webcamera.i: webcamera.cpp.i
+.PHONY : webcamera.i
+
+# target to preprocess a source file
+webcamera.cpp.i:
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/webcamera.cpp.i
+.PHONY : webcamera.cpp.i
+
+webcamera.s: webcamera.cpp.s
+.PHONY : webcamera.s
+
+# target to generate assembly for a file
+webcamera.cpp.s:
+	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/webcamera.cpp.s
+.PHONY : webcamera.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -224,6 +248,9 @@ help:
 	@echo "... fakecamera.o"
 	@echo "... fakecamera.i"
 	@echo "... fakecamera.s"
+	@echo "... webcamera.o"
+	@echo "... webcamera.i"
+	@echo "... webcamera.s"
 .PHONY : help
 
 
