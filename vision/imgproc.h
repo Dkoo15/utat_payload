@@ -11,6 +11,7 @@ namespace uavision{
 	void initialize(int, int, bool, int);
 	
 	void processRaw(std::vector<unsigned char> &rawbuffer); 
+	void assignData(std::vector<unsigned char> &rawbuffer);
 	void createPreview(int fac);
 	void openViewer(int delay);
 	void compressPreview(std::vector<unsigned char> &jpgbufr);

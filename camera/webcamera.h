@@ -1,17 +1,17 @@
-extern "C"{
-#include <arv.h>
-}
 
 #include "uavcamera.h"
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/video/tracking.hpp>
 #include <iostream>
 #include <fstream>
 #include <string>
 
-class AravisCam: public Uavcam {
+class WebCam: public Uavcam {
 
 	public: 
-		AravisCam();
-		~AravisCam();	
+		WebCam();
+		~WebCam();	
 		
 		bool initCamSetting(int &width, int &height);
 		void startCam();
@@ -20,9 +20,6 @@ class AravisCam: public Uavcam {
 		void endCam();
 
 	private:
-		ArvGc *genicam;
-		ArvDevice *device;
-		ArvStream *stream;
-		ArvGcNode *trigger;
-		int timeout, bufferq;
+		cv::VideoCapture cam;
+		cv::Mat frame;
 };
