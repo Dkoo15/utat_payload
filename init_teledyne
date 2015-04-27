@@ -1,4 +1,3 @@
 #gpsd /dev/tty.usbserial-A901L70Q
-#gpsd /dev/ttyUSB0
-#sudo ethtool -s eth0 speed 100 autoneg off
+gpsd /dev/ttyUSB0
 arv-tool-0.4 control GevSCPSPacketSize=1500 ExposureAuto=Off ExposureMode=Timed ExposureTime=40000 GainAuto=Once exposureAlignment=Reset autoBrightnessMode=Off TriggerMode=On TriggerSource=Software AcquisitionMode=Continuous 
