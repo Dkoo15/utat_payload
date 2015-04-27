@@ -14,4 +14,3 @@ target_link_libraries(utxPayload ${GLIB_LIBRARIES})
 target_link_libraries(utxPayload ${GOBJECT_LIBRARIES})
 target_link_libraries(utxPayload ${aravis_LIBRARY})
 target_link_libraries(utxPayload ${LIBGPS_LIBRARIES})
-
