@@ -26,11 +26,18 @@ void WebCam::startCam(){
 }
 
 void WebCam::sendTrigger(){
-	cam>>frame;
-	std::cout<<"Acquired Webcam picture"<<std::endl;
+	bool grab;
+	for (int i = 0; i<10; i++)
+		grab = cam.grab();
+	if (grab)
+		std::cout<<"Acquired Webcam picture"<<std::endl;
+	else
+		std::cout<<"Error acquiring webcam picture" <<std::endl;
 }
 
 bool WebCam::getBuffer(std::vector<unsigned char> &buffer){
+	cam.retrieve(frame);
+
 	if(frame.empty()){
 		std::cout<<"Error getting frame " << std::endl;
 		return false;
