@@ -9,6 +9,8 @@ bool WebCam::initCamSetting(int &width, int &height){
 
 	if(cam.isOpened()){
 		std::cout<<"Webcam initialized"<<std::endl;
+		cam.set(CV_CAP_PROP_FRAME_WIDTH,1280);
+		cam.set(CV_CAP_PROP_FRAME_HEIGHT,960);
 		width = (int) cam.get(CV_CAP_PROP_FRAME_WIDTH);
 		height = (int) cam.get(CV_CAP_PROP_FRAME_HEIGHT);
 		payload = width*height*3;
@@ -27,7 +29,7 @@ void WebCam::startCam(){
 
 void WebCam::sendTrigger(){
 	bool grab;
-	for (int i = 0; i<10; i++)
+	for (int i = 0; i<15; i++)
 		grab = cam.grab();
 	if (grab)
 		std::cout<<"Acquired Webcam picture"<<std::endl;

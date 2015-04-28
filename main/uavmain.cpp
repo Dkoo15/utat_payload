@@ -53,6 +53,8 @@ void imageWriter(){
 
 		if(saveimg) 
 		       	uavision::saveFullImage(ss.str());
+		else
+			std::cout<<"Not saving, on picture # "<< ip << std::endl;
 
 		ss.str("");
 	   	write_img = false;	

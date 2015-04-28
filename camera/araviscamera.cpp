@@ -3,7 +3,7 @@
 
 AravisCam::AravisCam(){
 	timeout = 20;
-	bufferq = 10;
+	bufferq = 5;
 }
 
 AravisCam:: ~AravisCam(){}
@@ -66,15 +66,15 @@ bool AravisCam::getBuffer(std::vector<unsigned char> &buffer){
 	int cycles = 0;
 	std::cout<<"Getting Buffer..."<<std::endl;
 	do {
-		g_usleep (10000);
+		g_usleep (100000);
 		cycles++;
-		do  {
+		//do  {
+		for (int i = 0; i < bufferq; i++){
 			arvbufr = arv_stream_try_pop_buffer (stream);
-			if (arvbufr != NULL){
-				std::cout<<"Buffer: ";
+			if (arvbufr != NULL){					
 				switch(arvbufr->status){
-					case ARV_BUFFER_STATUS_SUCCESS: std::cout<<"success"<<std::endl; break;
-					case ARV_BUFFER_STATUS_TIMEOUT: std::cout<<"timeout"<<std::endl; break;
+					case ARV_BUFFER_STATUS_SUCCESS: std::cout<<"Buffer Success"<<std::endl; break;
+					case ARV_BUFFER_STATUS_TIMEOUT: std::cout<<"Buffer Timeout"<<std::endl; break;
 					default: std::cout<<"error"<<std::endl;;
 				}
 				if (arvbufr->status == ARV_BUFFER_STATUS_SUCCESS){
@@ -83,13 +83,11 @@ bool AravisCam::getBuffer(std::vector<unsigned char> &buffer){
 				}	 
 				arv_stream_push_buffer (stream, arvbufr);
 			}		 
-		} while (arvbufr != NULL && !snapped);
+		}
+		//} while (arvbufr != NULL);// && !snapped);
 	}while(cycles < timeout && !snapped);
 
-	if (cycles >= timeout)	
-		return false;
-	else 	
-		return true;
+	return snapped;
 }
 
 void AravisCam::endCam(){
