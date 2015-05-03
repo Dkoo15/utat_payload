@@ -15,4 +15,4 @@ extern int ip;
 
 bool parseConfig();
 int checkLogInit();
-void writeLine(std::ofstream &logstream);
+void writeLine(std::ofstream &logstream, int h, int w, int s);

@@ -68,10 +68,14 @@ int checkLogInit(){
 	return saved;
 }
 
-void writeLine(std::ofstream &logstream){
+void writeLine(std::ofstream &logstream, int h, int m, int s){
 	logstream<<"im";
 	logstream<<std::setfill('0')<<std::setw(4)<<ip;
 	logstream<< ".jpg" <<",";
+	logstream << h << ",";
+	logstream << m << ",";
+	logstream << s << std::endl;;	
+	/*
 	logstream<<std::setprecision(8);
 	logstream<< location[0]<<",";
 	logstream<<std::setprecision(8);
@@ -79,5 +83,6 @@ void writeLine(std::ofstream &logstream){
 	logstream<< location[2]<<",";
 	logstream<< location[3];
 	logstream << std::endl;
+	*/
 }
 

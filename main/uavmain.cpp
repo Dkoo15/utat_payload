@@ -4,6 +4,7 @@
 #include <chrono>
 #include <mutex>
 #include <condition_variable>
+#include <ctime>
 
 //Project header files
 #include "araviscamera.h" 
@@ -108,12 +109,15 @@ int main(){
  	bool camera_ok, buffer_ok, gps_ok;
 	int num_saved;
 	int width, height;
+	int h, m, s;
+	time_t rawtime;
+	struct tm* timeinfo;
 	std::ofstream gpstream;
 	
 	parseConfig();
 	//Begin Threads
 	std::thread image_save_thrd(imageWriter);
-	std::thread gps_poll_thrd(gpsPoller);
+//	std::thread gps_poll_thrd(gpsPoller);
 
 	//Set Signals
 	std::signal(SIGINT,exit_signal); 	//Set up ctrl+c signal
@@ -130,7 +134,8 @@ int main(){
 	num_saved = checkLogInit();
 	gpstream.open("uav/save/uav_gps.log",std::ofstream::app);
 	if (num_saved == -1){
-		gpstream <<"Image,Latitude[deg],Longitude[deg],Altitude[m],Heading[deg]" << std::endl;
+	//	gpstream <<"Image,Latitude[deg],Longitude[deg],Altitude[m],Heading[deg]" << std::endl;
+		gpstream <<"Image,Hour,Minute,Second" << std::endl;
 		num_saved++;
 	}
 	ip = num_saved;	
@@ -154,8 +159,15 @@ int main(){
 
 		while(!finish){  //--Main Acquisition Loop
 			camera->sendTrigger();
+
+			time(&rawtime);
+			timeinfo = localtime(&rawtime);
+			h = timeinfo->tm_hour;
+			m = timeinfo->tm_min;
+			s = timeinfo->tm_sec;	
+					
 			buffer_ok = camera->getBuffer(rawbuf);
-			wakeThread(ACQUIRE_GPS);
+//			wakeThread(ACQUIRE_GPS);
 			if(buffer_ok){ //Acquired Image
 				ip++;
 
@@ -174,7 +186,7 @@ int main(){
 				else
 					std::this_thread::sleep_for(std::chrono::seconds(delay));
 
-				writeLine(gpstream);
+				writeLine(gpstream,h,m,s);
 			}
 			else{std::this_thread::sleep_for(std::chrono::seconds(1));	}
 
@@ -185,7 +197,7 @@ int main(){
 	stop_work = true;
 	wakeThread(-1);
 	image_save_thrd.join();
-	gps_poll_thrd.join();
+//	gps_poll_thrd.join();
 	gpstream.close();
 
 	delete camera;
