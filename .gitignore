@@ -16,3 +16,4 @@ install_manifest.txt
 CMakeCache.txt
 Makefile
 main/uavPayload
+tags
