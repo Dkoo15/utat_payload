@@ -3,7 +3,7 @@
 
 AravisCam::AravisCam(){
 	timeout = 20;
-	bufferq = 10;
+	bufferq = 5;
 }
 
 AravisCam:: ~AravisCam(){}

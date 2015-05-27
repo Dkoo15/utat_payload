@@ -80,4 +80,3 @@ void writeLine(std::ofstream &logstream){
 	logstream<< location[3];
 	logstream << std::endl;
 }
-

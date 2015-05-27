@@ -62,19 +62,12 @@ void imageWriter(){
 
 void gpsPoller(){
 	std::unique_lock<std::mutex> lock(mtx);
-	bool gps_ok = false;
-
 	while(1){ //repeat
 		while( stop_work == false && request_gps == false) convar.wait(lock);//Wait for work
 
 		if(stop_work) break;	//If finish signal is given, skip and leave;
 
-		if(usegps){
-			gps_ok = gps::getGPS(location);
-
-	   		if(gps_ok == false)  std::cout<<"GPS data not good"<<std::endl;
-			else	std::cout<<"Lat" << location[0] << ", Lon" <<location[1]<<std::endl;
-		}
+		if(usegps) gps::getGPS(location);
 		
 		request_gps = false;	
 	}

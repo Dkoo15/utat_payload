@@ -1,2 +1,2 @@
 #gpsd /dev/tty.usbserial-A901L70Q
-arv-tool-0.4 control GevSCPSPacketSize=1500 ExposureAuto=Off ExposureMode=Timed ExposureTime=40000 GainAuto=Once exposureAlignment=Reset autoBrightnessMode=Off TriggerMode=On TriggerSource=Software AcquisitionMode=Continuous 
+arv-tool-0.4 control GevSCPSPacketSize=1500 ExposureAuto=Off ExposureMode=Timed ExposureTime=1000 GainAuto=Continuous exposureAlignment=Reset autoBrightnessMode=Off TriggerMode=On TriggerSource=Software AcquisitionMode=Continuous 
