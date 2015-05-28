@@ -42,6 +42,11 @@ bool parseConfig(){
 			start_delay = val;
 			continue;
 		}
+		if(param.compare("imgstrm")==0){
+			imgstrm = val;
+			continue;
+		}
+
 	}
 	cfg_ok = true;
 
@@ -51,7 +56,7 @@ bool parseConfig(){
 
 int checkLogInit(){
 	int saved = 0;
-	std::ifstream logstream ("uav/save/uav_gps.log", std::ifstream::in);
+	std::ifstream logstream ("Pictures/uav_gps.log", std::ifstream::in);
 	
 	if(!logstream){
 		std::cout << "Starting from scratch" << std::endl;
@@ -68,13 +73,11 @@ int checkLogInit(){
 	return saved;
 }
 
-void writeLine(std::ofstream &logstream){
-	logstream<<"im";
-	logstream<<std::setfill('0')<<std::setw(4)<<ip;
-	logstream<< ".jpg" <<",";
-	logstream<<std::setprecision(8);
+void writeLine(std::ofstream &logstream, std::string image){
+	logstream<< image  <<",";
+	logstream<<std::setprecision(12);
 	logstream<< location[0]<<",";
-	logstream<<std::setprecision(8);
+	logstream<<std::setprecision(12);
 	logstream<< location[1]<<",";
 	logstream<< location[2]<<",";
 	logstream<< location[3];

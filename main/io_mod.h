@@ -6,13 +6,9 @@
 
 #define CONFIG_FILE "uav/utat_payload/options.cfg"
 
-extern int cameratype, usegps, saveimg, view;
-extern int sizefac, jpgq;
-extern int bufferq, timeout;
-extern int start_delay, delay;
+extern int cameratype, usegps, saveimg, view, sizefac, jpgq, bufferq, timeout, start_delay, delay, imgstrm;
 extern double location[4];
-extern int ip;
 
 bool parseConfig();
 int checkLogInit();
-void writeLine(std::ofstream &logstream);
+void writeLine(std::ofstream &logstream, std::string image);
