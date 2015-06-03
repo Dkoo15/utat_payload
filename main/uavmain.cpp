@@ -39,14 +39,14 @@ void gpsPoll(){
 void writeLine(std::ofstream &logstream, std::string image){
 	mtx.lock();
 	logstream<< image  <<",";
-	logstream<< std::fixed;
+	logstream.precision(9);
 	logstream<< gps::current_loc.latitude <<",";
 	logstream<< gps::current_loc.longitude<<",";
-	logstream.unsetf(std::ios_base::floatfield);
+	logstream.precision(2);
 	logstream<< gps::current_loc.altitude <<",";
-	logstream<< gps::current_loc.heading;
+	logstream<< gps::current_loc.heading << ",";
 	logstream<< gps::current_loc.tbuf;
-	logstream << std::endl;
+	logstream<< std::endl;
 	mtx.unlock();
 }
 
@@ -78,8 +78,8 @@ int main(){
 	//Check log and start numbering
 	n_saved = checkLogInit();
 	gpstream.open("Pictures/uav_gps.log",std::ofstream::app);
-	gpstream.precision(12);
-	if (n_saved == -1){
+	gpstream<< std::fixed;
+		if (n_saved == -1){
 		gpstream <<"Image,Latitude[deg],Longitude[deg],Altitude[m],Heading[deg]" << std::endl;
 		n_saved++;
 	}
