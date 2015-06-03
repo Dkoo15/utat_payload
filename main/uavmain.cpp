@@ -4,6 +4,7 @@
 #include <chrono>
 #include <mutex>
 #include <condition_variable>
+#include <iomanip>
 
 //Project header files
 #include "araviscamera.h" 
@@ -17,38 +18,37 @@
 
 volatile std::sig_atomic_t finish = 0; //Signal Variable
 std::mutex mtx;
-//std::condition_variable convar;
 bool stop_work = false;
 int cameratype, usegps, saveimg, view, sizefac, jpgq, bufferq, timeout, start_delay, delay, imgstrm; //Options
-double location[4]; //GPS Information
 
 void exit_signal(int param){
+	mtx.lock();
 	finish  = 1;
 	std::cout << "Exiting on next frame completion.." << std::endl;
+	mtx.unlock();
 }
 
 void gpsPoll(){
-	std::unique_lock<std::mutex> lock(mtx);
-/*	
- 	while(1){ //repeat
-		while( stop_work == false && request_gps == false) convar.wait(lock);//Wait for work
-
-		if(stop_work) break;	//If finish signal is given, skip and leave;
-
-		if(usegps) gps::getGPS(location);
-		
-		request_gps = false;	
+	while(!finish){
+		gps::readGPS();
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
-	std::cout<<"GPS Thread Done"<<std::endl;	
-*/
+	std::cout<<"GPS Thread joining..."<<std::endl;
 }
 
-/*
-void wakeThread(int id){
-	std::unique_lock<std::mutex> lock(mtx);
-	convar.notify_all();
+void writeLine(std::ofstream &logstream, std::string image){
+	mtx.lock();
+	logstream<< image  <<",";
+	logstream<<std::setprecision(12);
+	logstream<< gps::current_loc.latitude <<",";
+	logstream<<std::setprecision(12);
+	logstream<< gps::current_loc.longitude<<",";
+	logstream<< gps::current_loc.altitude <<",";
+	logstream<< gps::current_loc.heading;
+	logstream<< gps::current_loc.tbuf;
+	logstream << std::endl;
+	mtx.unlock();
 }
-*/
 
 int main(){
 	Uavcam *camera; 
@@ -63,9 +63,7 @@ int main(){
 
 	parseConfig();
 
-	//Begin Threads
-	std::thread gps_poll_thread(gpsPoll);
-
+	
 	//Set Signals
 	std::signal(SIGINT,exit_signal); 	//Set up Ctrl+C signal
 
@@ -86,9 +84,13 @@ int main(){
 	}
 
 	//Initialize GPS
- 	if((gps_ok = gps::startGPS())) 	std::cout<<"GPS is working! Check Lock"<<std::endl;
-	else		std::cout<<"GPS Error, no georeferencing"<<std::endl;
-		
+ 	if((gps_ok = gps::startGPS())) 	
+		std::cout<<"GPS is working! Check Lock"<<std::endl;
+	else		
+		std::cout<<"GPS Error, no georeferencing"<<std::endl;
+
+	std::thread gps_poll_thread(gpsPoll);
+	
 	//Initialize Camera Settings
 	camera_ok = camera->initCamSetting(width, height);
 	std::cout<<"Width = " << width << " Height = " << height << " Payload = "<< camera->payload<<std::endl;
@@ -118,6 +120,11 @@ int main(){
 				filename<<"im"<<std::setfill('0')<<std::setw(4)<<++n_saved;
 				filename<<".jpg";
 				fulldirectory<<PREFIX<<filename.str();
+				
+				if(gps::data_is_good)
+					std::cout<<"No GPS Data Available"<<std::endl;
+				else
+					std::cout<<"GPS Data up to date" <<std::endl;
 
 				writeLine(gpstream, filename.str());
 
