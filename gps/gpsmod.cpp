@@ -42,7 +42,7 @@ namespace gps{
 				current_loc.altitude  = data->fix.altitude;
 				current_loc.heading = data->fix.track;
 			 	unix_to_iso8601(data->fix.time, current_loc.tbuf, sizeof(current_loc.tbuf));
-				data_is_good = false;
+				data_is_good = true;
 				gpsmtx.unlock();
 			}
 		}

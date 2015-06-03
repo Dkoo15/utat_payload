@@ -39,10 +39,10 @@ void gpsPoll(){
 void writeLine(std::ofstream &logstream, std::string image){
 	mtx.lock();
 	logstream<< image  <<",";
-	logstream<<std::setprecision(12);
+	logstream<< std::fixed;
 	logstream<< gps::current_loc.latitude <<",";
-	logstream<<std::setprecision(12);
 	logstream<< gps::current_loc.longitude<<",";
+	logstream.unsetf(std::ios_base::floatfield);
 	logstream<< gps::current_loc.altitude <<",";
 	logstream<< gps::current_loc.heading;
 	logstream<< gps::current_loc.tbuf;
@@ -78,6 +78,7 @@ int main(){
 	//Check log and start numbering
 	n_saved = checkLogInit();
 	gpstream.open("Pictures/uav_gps.log",std::ofstream::app);
+	gpstream.precision(12);
 	if (n_saved == -1){
 		gpstream <<"Image,Latitude[deg],Longitude[deg],Altitude[m],Heading[deg]" << std::endl;
 		n_saved++;
@@ -122,9 +123,9 @@ int main(){
 				fulldirectory<<PREFIX<<filename.str();
 				
 				if(gps::data_is_good)
-					std::cout<<"No GPS Data Available"<<std::endl;
+					std::cout<<"GPS up to date"<<std::endl;
 				else
-					std::cout<<"GPS Data up to date" <<std::endl;
+					std::cout<<"No GPS available" <<std::endl;
 
 				writeLine(gpstream, filename.str());
 
