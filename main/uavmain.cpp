@@ -4,7 +4,7 @@
 #include <chrono>
 #include <mutex>
 #include <condition_variable>
-#include <ctime>
+#include <iomanip>
 
 //Project header files
 #include "araviscamera.h" 
@@ -14,92 +14,39 @@
 #include "gpsmod.h"
 #include "io_mod.h"
 
-//Constants
-#define ACQUIRE_GPS 1
-#define SAVE_IMAGE 2
-#define STREAM_IMAGE 3
-#define PREFIX "uav/save/im"
+#define PREFIX "Pictures/"
 
-volatile std::sig_atomic_t finish = 0;
+volatile std::sig_atomic_t finish = 0; //Signal Variable
 std::mutex mtx;
-std::condition_variable convar;
-bool write_img = false;
-bool packet = false;;
-bool request_gps = false;
-bool stop_work = false;
-bool bayer = false;
-int cameratype, usegps, saveimg, view;
-int sizefac, jpgq;
-int bufferq, timeout;
-int start_delay, delay;
-double location[4];
-int ip;
+int cameratype, usegps, saveimg, view, sizefac, jpgq, bufferq, timeout, start_delay, delay, imgstrm; //Options
 
 void exit_signal(int param){
+	mtx.lock();
 	finish  = 1;
 	std::cout << "Exiting on next frame completion.." << std::endl;
+	mtx.unlock();
 }
 
-void imageWriter(){
-	std::unique_lock<std::mutex> lock(mtx);
-	std::stringstream ss;
-	while(1){ //repeat
-		while( stop_work == false && write_img == false) convar.wait(lock);//Wait for work
-
-		if(stop_work) break;	//If finish signal is given, skip and leave;
-	
-		ss<<PREFIX;
-		ss<<std::setfill('0')<<std::setw(4)<<ip;
-		ss<<".jpg";
-
-		if(saveimg) 
-		       	uavision::saveFullImage(ss.str());
-		else
-			std::cout<<"Not saving, on picture # "<< ip << std::endl;
-
-		ss.str("");
-	   	write_img = false;	
+void gpsPoll(){
+	while(!finish){
+		gps::readGPS();
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
-	std::cout<<"Image Writing Thread Done"<<std::endl;
+	std::cout<<"GPS Thread joining..."<<std::endl;
 }
 
-void gpsPoller(){
-	std::unique_lock<std::mutex> lock(mtx);
-	bool gps_ok = false;
-
-	while(1){ //repeat
-		while( stop_work == false && request_gps == false) convar.wait(lock);//Wait for work
-
-		if(stop_work) break;	//If finish signal is given, skip and leave;
-
-		if(usegps){
-			gps_ok = gps::getGPS(location);
-
-	   		if(gps_ok == false)  std::cout<<"GPS data not good"<<std::endl;
-			else	std::cout<<"Lat" << location[0] << ", Lon" <<location[1]<<std::endl;
-		}
-		
-		request_gps = false;	
-	}
-	std::cout<<"GPS Thread Done"<<std::endl;
-}
-
-void wakeThread(int id){
-	std::unique_lock<std::mutex> lock(mtx);
-	switch (id){
-		case ACQUIRE_GPS:
-			request_gps = true;
-			break;
-		case SAVE_IMAGE:
-			write_img = true;
-			break;
-		case STREAM_IMAGE:
-			packet = true;
-			break;
-		default:
-			break;
-	}
-	convar.notify_all();
+void writeLine(std::ofstream &logstream, std::string image){
+	mtx.lock();
+	logstream<< image  <<",";
+	logstream.precision(9);
+	logstream<< gps::current_loc.latitude <<",";
+	logstream<< gps::current_loc.longitude<<",";
+	logstream.precision(2);
+	logstream<< gps::current_loc.altitude <<",";
+	logstream<< gps::current_loc.heading << ",";
+	logstream<< gps::current_loc.tbuf;
+	logstream<< std::endl;
+	mtx.unlock();
 }
 
 int main(){
@@ -107,20 +54,16 @@ int main(){
 	std::vector<unsigned char> rawbuf;
 	std::vector<unsigned char> jpgbuffer;
  	bool camera_ok, buffer_ok, gps_ok;
-	int num_saved;
+	int n_saved;
 	int width, height;
-	int h, m, s;
-	time_t rawtime;
-	struct tm* timeinfo;
 	std::ofstream gpstream;
-	
+	std::stringstream filename;
+	std::stringstream fulldirectory;
+
 	parseConfig();
-	//Begin Threads
-	std::thread image_save_thrd(imageWriter);
-//	std::thread gps_poll_thrd(gpsPoller);
 
 	//Set Signals
-	std::signal(SIGINT,exit_signal); 	//Set up ctrl+c signal
+	std::signal(SIGINT,exit_signal); 	//Set up Ctrl+C signal
 
 	//Construct Classes
 	if (cameratype == 0)	
@@ -131,19 +74,22 @@ int main(){
 		camera = new WebCam();
 
 	//Check log and start numbering
-	num_saved = checkLogInit();
-	gpstream.open("uav/save/uav_gps.log",std::ofstream::app);
-	if (num_saved == -1){
-	//	gpstream <<"Image,Latitude[deg],Longitude[deg],Altitude[m],Heading[deg]" << std::endl;
-		gpstream <<"Image,Hour,Minute,Second" << std::endl;
-		num_saved++;
+	n_saved = checkLogInit();
+	gpstream.open("Pictures/uav_gps.log",std::ofstream::app);
+	gpstream<< std::fixed;
+		if (n_saved == -1){
+		gpstream <<"Image,Latitude[deg],Longitude[deg],Altitude[m],Heading[deg]" << std::endl;
+		n_saved++;
 	}
-	ip = num_saved;	
 
 	//Initialize GPS
- 	if((gps_ok = gps::startGPS())) 	std::cout<<"GPS is working! Check Lock"<<std::endl;
-	else		std::cout<<"GPS Error, no georeferencing"<<std::endl;
-		
+ 	if((gps_ok = gps::startGPS())) 	
+		std::cout<<"GPS is working! Check Lock"<<std::endl;
+	else		
+		std::cout<<"GPS Error, no georeferencing"<<std::endl;
+
+	std::thread gps_poll_thread(gpsPoll);
+	
 	//Initialize Camera Settings
 	camera_ok = camera->initCamSetting(width, height);
 	std::cout<<"Width = " << width << " Height = " << height << " Payload = "<< camera->payload<<std::endl;
@@ -159,45 +105,48 @@ int main(){
 
 		while(!finish){  //--Main Acquisition Loop
 			camera->sendTrigger();
-
-			time(&rawtime);
-			timeinfo = localtime(&rawtime);
-			h = timeinfo->tm_hour;
-			m = timeinfo->tm_min;
-			s = timeinfo->tm_sec;	
-					
 			buffer_ok = camera->getBuffer(rawbuf);
-//			wakeThread(ACQUIRE_GPS);
+
 			if(buffer_ok){ //Acquired Image
-				ip++;
 
 				if(cameratype <= 1)
 					uavision::processRaw(rawbuf);
 				else 
 					uavision::assignData(rawbuf);
 
-				wakeThread(SAVE_IMAGE);
+				filename.str("");
+				fulldirectory.str("");
+				filename<<"im"<<std::setfill('0')<<std::setw(4)<<++n_saved;
+				filename<<".jpg";
+				fulldirectory<<PREFIX<<filename.str();
 				
+				if(gps::data_is_good)
+					std::cout<<"GPS up to date"<<std::endl;
+				else
+					std::cout<<"No GPS available" <<std::endl;
+
+				writeLine(gpstream, filename.str());
+
+				if(imgstrm)  uavision::compressPreview(jpgbuffer);
+					
+				if(saveimg)  uavision::saveFullImage(fulldirectory.str());
+
 				if(view){
 					uavision::createPreview(sizefac);
 					uavision::openViewer(delay);
-					//uavision::compressPreview(jpgbuffer)
 				}
-				else
+				else	
 					std::this_thread::sleep_for(std::chrono::seconds(delay));
 
-				writeLine(gpstream,h,m,s);
 			}
-			else{std::this_thread::sleep_for(std::chrono::seconds(1));	}
+			else	
+				std::this_thread::sleep_for(std::chrono::seconds(delay));
 
 		}
 		camera->endCam();
 	}
 
-	stop_work = true;
-	wakeThread(-1);
-	image_save_thrd.join();
-//	gps_poll_thrd.join();
+	gps_poll_thread.join();
 	gpstream.close();
 
 	delete camera;

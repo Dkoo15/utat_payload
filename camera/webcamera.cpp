@@ -39,7 +39,6 @@ void WebCam::sendTrigger(){
 
 bool WebCam::getBuffer(std::vector<unsigned char> &buffer){
 	cam.retrieve(frame);
-
 	if(frame.empty()){
 		std::cout<<"Error getting frame " << std::endl;
 		return false;
