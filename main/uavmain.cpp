@@ -18,7 +18,6 @@
 
 volatile std::sig_atomic_t finish = 0; //Signal Variable
 std::mutex mtx;
-bool stop_work = false;
 int cameratype, usegps, saveimg, view, sizefac, jpgq, bufferq, timeout, start_delay, delay, imgstrm; //Options
 
 void exit_signal(int param){
@@ -143,8 +142,6 @@ int main(){
 		}
 		camera->endCam();
 	}
-
-	stop_work = true;
 
 	gps_poll_thread.join();
 	gpstream.close();
