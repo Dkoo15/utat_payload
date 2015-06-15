@@ -16,9 +16,11 @@
 
 #define PREFIX "Pictures/"
 
+#include <time.h>
 volatile std::sig_atomic_t finish = 0; //Signal Variable
 std::mutex mtx;
-int cameratype, usegps, saveimg, view, sizefac, jpgq, bufferq, timeout, start_delay, delay, imgstrm; //Options
+int cameratype, usegps, saveimg, view, sizefac, jpgq, bufferq, timeout, start_delay, imgstrm; //Options
+float rawgain[3];
 
 void exit_signal(int param){
 	mtx.lock();
@@ -29,7 +31,9 @@ void exit_signal(int param){
 
 void gpsPoll(){
 	while(!finish){
-		gps::readGPS();
+		if (usegps)
+			gps::readGPS();
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 	std::cout<<"GPS Thread joining..."<<std::endl;
@@ -94,11 +98,12 @@ int main(){
 	//Initialize Camera Settings
 	camera_ok = camera->initCamSetting(width, height);
 	std::cout<<"Width = " << width << " Height = " << height << " Payload = "<< camera->payload<<std::endl;
-
+	clock_t start;
+	double elapsed;
 	//Start Camera!
 	if (camera_ok) {
 		rawbuf.resize(camera->payload);
-		uavision::initialize(width, height, view, jpgq);
+		uavision::initialize(width, height, view, jpgq, rawgain);
 
 		std::cout << "Start camera acquisition in " << start_delay << " seconds" << std::endl;
 		std::this_thread::sleep_for(std::chrono::seconds(start_delay));	
@@ -109,12 +114,13 @@ int main(){
 			buffer_ok = camera->getBuffer(rawbuf);
 
 			if(buffer_ok){ //Acquired Image
-
+				start = clock();
 				if(cameratype <= 1)
 					uavision::processRaw(rawbuf);
 				else 
 					uavision::assignData(rawbuf);
-
+				elapsed = (clock()-start)/(double)(CLOCKS_PER_SEC/1000);
+				std::cout<<"Time : " << elapsed << std::endl;
 				filename.str("");
 				fulldirectory.str("");
 				filename<<"im"<<std::setfill('0')<<std::setw(4)<<++n_saved;
@@ -134,11 +140,14 @@ int main(){
 
 				if(view){
 					uavision::createPreview(sizefac);
-					uavision::openViewer(delay);
+					uavision::openViewer();
 				}
-				else	std::this_thread::sleep_for(std::chrono::seconds(delay));
+				else	std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
 			}
+			else
+				std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
 		}
 		camera->endCam();
 	}

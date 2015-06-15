@@ -5,6 +5,7 @@ namespace uavision
         cv::Mat raw;
         cv::Mat rgb;
         cv::Mat preview;
+	float gain[3];
         std::vector<int> jpg_params;
 	cv::Size size;
 
@@ -12,16 +13,19 @@ namespace uavision
 		bool iswritten;
 		if (!rgb.data) return;
 
-		iswritten = cv::imwrite(imagename, rgb, jpg_params); //Average Time ~300 ms
+		iswritten = cv::imwrite(imagename, rgb, jpg_params); 
 		std::cout <<"Saved image to file " << imagename << std::endl;
 
 	}
 
 
-	void initialize(int w, int h, bool view, int qual){
+	void initialize(int w, int h, bool view, int qual, float g[3]){
 		jpg_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 		jpg_params.push_back(qual);
 		size = cv::Size(w, h);
+		gain[0] = g[0];
+		gain[1] = g[1];
+		gain[2] = g[2];
 		if (view) cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);
 	}
 
@@ -30,12 +34,35 @@ namespace uavision
 		cv::resize(rgb,preview,cv::Size(),downsize,downsize,cv::INTER_NEAREST);
 	}
 
-	void openViewer(int delay){
+	void openViewer(){
 		cv::imshow("Camera Viewer",preview);
-		cv::waitKey(delay*1000);
+		cv::waitKey(1000);
 	}
 
 	void processRaw(std::vector<unsigned char> &rawbuffer){	
+		//Apply Gain Matrix	
+		unsigned char* pix = &rawbuffer[0];
+		float tmp;
+		int jmax = (int) (size.height/2);
+		int imax = (int) (size.width/2);
+		for (int j = 0; j<jmax; j++){
+			for (int i = 0; i<imax; i++){
+				tmp = (float)(*pix);
+				(*pix) = tmp*gain[1];
+				pix++;
+				tmp = (float)(*pix);
+				(*pix) = tmp*gain[2];
+				pix++;
+			}		
+			for (int i = 0; i<imax; i++){
+				tmp = (float)(*pix);
+				(*pix) = tmp*gain[0];
+				pix++;
+				tmp = (float)(*pix);
+				(*pix) = tmp*gain[1];
+				pix++;
+			}
+		}	
 		raw = cv::Mat(size,CV_8UC1,&rawbuffer[0]);
 		cv::cvtColor(raw,rgb,CV_BayerGB2RGB);	//Average Time = ~15 ms 
 	}
