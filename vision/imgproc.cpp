@@ -19,13 +19,10 @@ namespace uavision
 	}
 
 
-	void initialize(int w, int h, bool view, int qual, float g[3]){
+	void initialize(int w, int h, bool view, int qual){
 		jpg_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 		jpg_params.push_back(qual);
 		size = cv::Size(w, h);
-		gain[0] = g[0];
-		gain[1] = g[1];
-		gain[2] = g[2];
 		if (view) cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);
 	}
 
@@ -41,6 +38,7 @@ namespace uavision
 
 	void processRaw(std::vector<unsigned char> &rawbuffer){	
 		//Apply Gain Matrix	
+		/*
 		unsigned char* pix = &rawbuffer[0];
 		float tmp;
 		int jmax = (int) (size.height/2);
@@ -63,6 +61,7 @@ namespace uavision
 				pix++;
 			}
 		}	
+		*/
 		raw = cv::Mat(size,CV_8UC1,&rawbuffer[0]);
 		cv::cvtColor(raw,rgb,CV_BayerGB2RGB);	//Average Time = ~15 ms 
 	}

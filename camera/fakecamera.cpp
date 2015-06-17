@@ -9,7 +9,7 @@ bool Imgfromfile::initCamSetting(int &width, int &height){
 	height = 3072;
 	payload = 12582912;
 	i = 1;
-	n = 3;
+	n = 8;
 	return true;
 }
 
@@ -29,7 +29,7 @@ bool Imgfromfile::getBuffer(std::vector<unsigned char> &buffer){
 
 	if(i > n)   i = 1;
 	
-	ss << "uav/utat_payload/camera/stockbuffers/img00" <<i;
+	ss << "uav/utat_payload/camera/stockbuffers/im000" <<i;
 	filename = ss.str();
 	i++;
 	bufferfile.open(filename,std::ifstream::binary);

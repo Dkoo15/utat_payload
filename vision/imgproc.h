@@ -8,7 +8,7 @@
 
 namespace uavision{
 	
-	void initialize(int, int, bool, int, float[3]);
+	void initialize(int, int, bool, int);
 	
 	void processRaw(std::vector<unsigned char> &rawbuffer); 
 	void assignData(std::vector<unsigned char> &rawbuffer);

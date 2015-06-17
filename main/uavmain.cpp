@@ -16,7 +16,6 @@
 
 #define PREFIX "Pictures/"
 
-#include <time.h>
 volatile std::sig_atomic_t finish = 0; //Signal Variable
 std::mutex mtx;
 int cameratype, usegps, saveimg, view, sizefac, jpgq, bufferq, timeout, start_delay, imgstrm; //Options
@@ -55,6 +54,7 @@ void writeLine(std::ofstream &logstream, std::string image){
 
 int main(){
 	Uavcam *camera; 
+	Webcam webcamiera;
 	std::vector<unsigned char> rawbuf;
 	std::vector<unsigned char> jpgbuffer;
  	bool camera_ok, buffer_ok, gps_ok;
@@ -75,8 +75,8 @@ int main(){
 		camera = new Imgfromfile();
 	else if (cameratype == 1)
 		camera = new AravisCam();
-	else if (cameratype == 2)
-		camera = new WebCam();
+	
+	webcamera = new WebCam();
 
 	//Check log and start numbering
 	n_saved = checkLogInit();
@@ -98,8 +98,6 @@ int main(){
 	//Initialize Camera Settings
 	camera_ok = camera->initCamSetting(width, height);
 	std::cout<<"Width = " << width << " Height = " << height << " Payload = "<< camera->payload<<std::endl;
-	clock_t start;
-	double elapsed;
 	//Start Camera!
 	if (camera_ok) {
 		rawbuf.resize(camera->payload);
@@ -114,19 +112,22 @@ int main(){
 			buffer_ok = camera->getBuffer(rawbuf);
 
 			if(buffer_ok){ //Acquired Image
-				start = clock();
+
 				if(cameratype <= 1)
 					uavision::processRaw(rawbuf);
 				else 
 					uavision::assignData(rawbuf);
-				elapsed = (clock()-start)/(double)(CLOCKS_PER_SEC/1000);
-				std::cout<<"Time : " << elapsed << std::endl;
+
 				filename.str("");
 				fulldirectory.str("");
 				filename<<"im"<<std::setfill('0')<<std::setw(4)<<++n_saved;
 				filename<<".jpg";
 				fulldirectory<<PREFIX<<filename.str();
-				
+		/*		std::ofstream bufferout;		
+				bufferout.open(fulldirectory.str(),std::ofstream::binary);
+				bufferout.write((char*)&rawbuf[0],camera->payload);
+				bufferout.close();
+		*/
 				if(gps::data_is_good)
 					std::cout<<"GPS up to date"<<std::endl;
 				else
