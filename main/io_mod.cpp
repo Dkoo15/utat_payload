@@ -47,17 +47,6 @@ bool parseConfig(){
 			imgstrm = std::stoi(num);
 			continue;
 		}
-		if(param.compare("gain")==0){
-			std::getline(cfgstream,num,',');
-			rawgain[0] = std::stof(num);
-			std::getline(cfgstream,num,',');
-			rawgain[1] = std::stof(num);
-			std::getline(cfgstream,num,',');
-			rawgain[2] = std::stof(num);
-			std::getline(cfgstream,num);
-			continue;
-		}
-
 	}
 	cfg_ok = true;
 

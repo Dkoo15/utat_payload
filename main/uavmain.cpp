@@ -19,7 +19,6 @@
 volatile std::sig_atomic_t finish = 0; //Signal Variable
 std::mutex mtx;
 int cameratype, usegps, saveimg, view, sizefac, jpgq, bufferq, timeout, start_delay, imgstrm; //Options
-float rawgain[3];
 
 void exit_signal(int param){
 	mtx.lock();
@@ -54,7 +53,6 @@ void writeLine(std::ofstream &logstream, std::string image){
 
 int main(){
 	Uavcam *camera; 
-	Webcam webcamiera;
 	std::vector<unsigned char> rawbuf;
 	std::vector<unsigned char> jpgbuffer;
  	bool camera_ok, buffer_ok, gps_ok;
@@ -62,7 +60,10 @@ int main(){
 	int width, height;
 	std::ofstream gpstream;
 	std::stringstream filename;
-	std::stringstream fulldirectory;
+	std::stringstream directory1;
+	std::stringstream directory2;
+
+	WebCam *webcamera;
 
 	parseConfig();
 
@@ -98,10 +99,12 @@ int main(){
 	//Initialize Camera Settings
 	camera_ok = camera->initCamSetting(width, height);
 	std::cout<<"Width = " << width << " Height = " << height << " Payload = "<< camera->payload<<std::endl;
+	webcamera->openWebcam();
+
 	//Start Camera!
 	if (camera_ok) {
 		rawbuf.resize(camera->payload);
-		uavision::initialize(width, height, view, jpgq, rawgain);
+		uavision::initialize(width, height, view, jpgq);
 
 		std::cout << "Start camera acquisition in " << start_delay << " seconds" << std::endl;
 		std::this_thread::sleep_for(std::chrono::seconds(start_delay));	
@@ -119,10 +122,12 @@ int main(){
 					uavision::assignData(rawbuf);
 
 				filename.str("");
-				fulldirectory.str("");
+				directory1.str("");
+				directory2.str("");
 				filename<<"im"<<std::setfill('0')<<std::setw(4)<<++n_saved;
 				filename<<".jpg";
-				fulldirectory<<PREFIX<<filename.str();
+				directory1<<PREFIX<<filename.str();
+				directory2<<PREFIX<<"webcam/"<<filename.str();
 		/*		std::ofstream bufferout;		
 				bufferout.open(fulldirectory.str(),std::ofstream::binary);
 				bufferout.write((char*)&rawbuf[0],camera->payload);
@@ -132,12 +137,13 @@ int main(){
 					std::cout<<"GPS up to date"<<std::endl;
 				else
 					std::cout<<"No GPS available" <<std::endl;
-
+	
+				webcamera->saveFrame(directory2.str());
 				writeLine(gpstream, filename.str());
 
 				if(imgstrm)  uavision::compressPreview(jpgbuffer);
 					
-				if(saveimg)  uavision::saveFullImage(fulldirectory.str());
+				if(saveimg)  uavision::saveFullImage(directory1.str());
 
 				if(view){
 					uavision::createPreview(sizefac);

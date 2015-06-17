@@ -19,10 +19,11 @@ class WebCam: public Uavcam {
 		bool getBuffer(std::vector<unsigned char> &buffer);
 		void endCam();
 
-		void openWebcam();
-		void saveImage(std::string filename);
+		bool openWebcam();
+		void saveFrame(std::string filename);
 
 	private:
 		cv::VideoCapture cam;
 		cv::Mat frame;
+		std::vector<int> jpg_params;
 };
