@@ -4,49 +4,49 @@ bool parseConfig(){
 	std::ifstream cfgstream(CONFIG_FILE, std::ifstream::in);
 	std::string param, num;
 	bool cfg_ok = false;
-	int val;
 	if(!cfgstream) return cfg_ok;
 
 	while(std::getline(cfgstream,param,'=')) {
-		std::getline(cfgstream,num);
-		val = std::stoi(num);
 		if (param.compare("cameratype")==0){
-			cameratype = val;
+			std::getline(cfgstream,num);
+			cameratype = std::stoi(num);
 			continue;
 		}
 		if (param.compare("usegps")==0){
-			usegps = val;
+			std::getline(cfgstream,num);
+			usegps = std::stoi(num);
 			continue;
 		}
 		if(param.compare("savepicture")==0){
-			saveimg = val;
+			std::getline(cfgstream,num);
+			saveimg = std::stoi(num);
 			continue;
 		}
 		if(param.compare("sizefactor")==0){
-			sizefac = val;
-			continue;
-		}
-		if(param.compare("delay")==0){
-			delay = val;
+			std::getline(cfgstream,num);
+			sizefac = std::stoi(num);
 			continue;
 		}
 		if(param.compare("jpgq")==0){
-			jpgq = val;		
+			std::getline(cfgstream,num);
+			jpgq  = std::stoi(num);
 			continue;
 		}
 		if(param.compare("viewer")==0){
-			view = val;
+			std::getline(cfgstream,num);
+			view = std::stoi(num);
 			continue;
 		}
 		if(param.compare("start_delay")==0){
-			start_delay = val;
+			std::getline(cfgstream,num);
+			start_delay = std::stoi(num);
 			continue;
 		}
 		if(param.compare("imgstrm")==0){
-			imgstrm = val;
+			std::getline(cfgstream,num);
+			imgstrm = std::stoi(num);
 			continue;
 		}
-
 	}
 	cfg_ok = true;
 

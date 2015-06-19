@@ -8,6 +8,7 @@ cmake_install*
 camera/.deps/
 main/.deps/
 camera/CMakeFiles/
+camera/stockbuffers/
 imgproc/CMakeFiles/
 main/Makefile
 camera/Makefile
