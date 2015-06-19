@@ -98,19 +98,28 @@ int main(){
 	
 	//Initialize Camera Settings
 	camera_ok = camera->initCamSetting(width, height);
-	std::cout<<"Width = " << width << " Height = " << height << " Payload = "<< camera->payload<<std::endl;
-	webcamera->openWebcam();
-
-	//Start Camera!
 	if (camera_ok) {
+		std::cout<<"Width = " << width << " Height = " << height << " Payload = "<< camera->payload<<std::endl;
 		rawbuf.resize(camera->payload);
 		uavision::initialize(width, height, view, jpgq);
+	}
+	webcamera->openWebcam();
 
-		std::cout << "Start camera acquisition in " << start_delay << " seconds" << std::endl;
-		std::this_thread::sleep_for(std::chrono::seconds(start_delay));	
-		camera->startCam();
+	std::cout << "Start camera acquisition in " << start_delay << " seconds" << std::endl;
+	std::this_thread::sleep_for(std::chrono::seconds(start_delay));	
 
-		while(!finish){  //--Main Acquisition Loop
+	if (camera_ok) camera->startCam();
+
+	while(!finish){  //--Main Acquisition Loop
+		filename.str("");
+		directory1.str("");
+		directory2.str("");
+		filename<<"im"<<std::setfill('0')<<std::setw(4)<<++n_saved;
+		filename<<".jpg";
+		directory1<<PREFIX<<filename.str();
+		directory2<<PREFIX<<"webcam/"<<filename.str();
+
+		if(camera_ok){
 			camera->sendTrigger();
 			buffer_ok = camera->getBuffer(rawbuf);
 
@@ -120,27 +129,7 @@ int main(){
 					uavision::processRaw(rawbuf);
 				else 
 					uavision::assignData(rawbuf);
-
-				filename.str("");
-				directory1.str("");
-				directory2.str("");
-				filename<<"im"<<std::setfill('0')<<std::setw(4)<<++n_saved;
-				filename<<".jpg";
-				directory1<<PREFIX<<filename.str();
-				directory2<<PREFIX<<"webcam/"<<filename.str();
-		/*		std::ofstream bufferout;		
-				bufferout.open(fulldirectory.str(),std::ofstream::binary);
-				bufferout.write((char*)&rawbuf[0],camera->payload);
-				bufferout.close();
-		*/
-				if(gps::data_is_good)
-					std::cout<<"GPS up to date"<<std::endl;
-				else
-					std::cout<<"No GPS available" <<std::endl;
-	
-				webcamera->saveFrame(directory2.str());
-				writeLine(gpstream, filename.str());
-
+				
 				if(imgstrm)  uavision::compressPreview(jpgbuffer);
 					
 				if(saveimg)  uavision::saveFullImage(directory1.str());
@@ -149,15 +138,19 @@ int main(){
 					uavision::createPreview(sizefac);
 					uavision::openViewer();
 				}
-				else	std::this_thread::sleep_for(std::chrono::milliseconds(250));
-
 			}
-			else
-				std::this_thread::sleep_for(std::chrono::milliseconds(250));
-
+		
 		}
-		camera->endCam();
+		writeLine(gpstream, filename.str());
+		webcamera->saveFrame(directory2.str());
+	
+		if(gps::data_is_good)	std::cout<<"GPS up to date"<<std::endl;
+		else	std::cout<<"No GPS available" <<std::endl;
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
 	}
+	if(camera_ok) camera->endCam();
 
 	gps_poll_thread.join();
 	gpstream.close();
