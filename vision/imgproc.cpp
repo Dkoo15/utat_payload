@@ -10,9 +10,8 @@ namespace uavision
 
 	void saveFullImage(std::string imagename){ 	//This function will be called form a separate thread
 		bool iswritten;
-		if (!rgb.data) return;
-
-		iswritten = cv::imwrite(imagename, rgb, jpg_params); //Average Time ~300 ms
+		//iswritten = cv::imwrite(imagename, rgb, jpg_params); //Average Time ~300 ms
+		iswritten = cv::imwrite(imagename, preview, jpg_params); 
 		std::cout <<"Saved image to file " << imagename << std::endl;
 
 	}
@@ -30,9 +29,9 @@ namespace uavision
 		cv::resize(rgb,preview,cv::Size(),downsize,downsize,cv::INTER_NEAREST);
 	}
 
-	void openViewer(int delay){
+	void openViewer(){
 		cv::imshow("Camera Viewer",preview);
-		cv::waitKey(delay*1000);
+		cv::waitKey(1000);
 	}
 
 	void processRaw(std::vector<unsigned char> &rawbuffer){	

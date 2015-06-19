@@ -126,21 +126,19 @@ int main(){
 					std::cout<<"No GPS available" <<std::endl;
 
 				writeLine(gpstream, filename.str());
+				
+				uavision::createPreview(sizefac);
+				if(saveimg)  
+					uavision::saveFullImage(fulldirectory.str());
 
-				if(imgstrm)  uavision::compressPreview(jpgbuffer);
-					
-				if(saveimg)  uavision::saveFullImage(fulldirectory.str());
-
-				if(view){
-					uavision::createPreview(sizefac);
-					uavision::openViewer(delay);
-				}
+				if(view)
+					uavision::openViewer();
 				else	
-					std::this_thread::sleep_for(std::chrono::seconds(delay));
+					std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 			}
 			else	
-				std::this_thread::sleep_for(std::chrono::seconds(delay));
+				std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
 		}
 		camera->endCam();

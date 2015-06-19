@@ -13,7 +13,7 @@ namespace uavision{
 	void processRaw(std::vector<unsigned char> &rawbuffer); 
 	void assignData(std::vector<unsigned char> &rawbuffer);
 	void createPreview(int fac);
-	void openViewer(int delay);
+	void openViewer();
 	void compressPreview(std::vector<unsigned char> &jpgbufr);
 
 	void saveFullImage(std::string imagename);
