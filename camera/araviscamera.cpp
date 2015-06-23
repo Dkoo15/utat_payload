@@ -16,6 +16,7 @@ bool AravisCam::initializeCam(){
 	std::vector<std::string> settings; 
 	GType value_type;
 	bool config_ok;
+	int width, height;
 
 //  Initial Setup - Find the Camera	
 	std::cout<<"Looking for the Camera...\n";
@@ -32,13 +33,15 @@ bool AravisCam::initializeCam(){
 	genicam = arv_device_get_genicam(device);
 
 	feature = arv_gc_get_node(genicam,"Width");
-	this->width = arv_gc_integer_get_value(ARV_GC_INTEGER (feature), NULL);
+	width = arv_gc_integer_get_value(ARV_GC_INTEGER (feature), NULL);
 		
 	feature = arv_gc_get_node(genicam,"Height");
-	this->height = arv_gc_integer_get_value(ARV_GC_INTEGER (feature), NULL);
+	height = arv_gc_integer_get_value(ARV_GC_INTEGER (feature), NULL);
 
 	feature = arv_gc_get_node (genicam, "PayloadSize");
 	payload = arv_gc_integer_get_value (ARV_GC_INTEGER (feature), NULL);
+
+	std::cout<<"Image " << width << "x" << height << ", " << payload << " bytes " << std::endl;
 
 	//Create Stream and fill buffer queue
 	stream = arv_device_create_stream (device, NULL, NULL);

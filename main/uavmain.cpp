@@ -61,26 +61,22 @@ int main(){
 	//Construct Cameras
 	if (cameratype == 1)
 		camera = new AravisCam();
-	else //(cameratype ==2)
+	else
 		camera = new WebCam();
 	
 	if(view)	
 		cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);
 	
-	//Check log and open
-	n_saved = checkLog();
+	n_saved = checkLog(); 			//Check the log and open it
 	openLogtoWrite(n_saved);
 
-	//Initialize GPS
-	ublox = new Gps();	
+	ublox = new Gps();			//Initialize the GPS
 	std::thread gps_thread(gpsUpdate);
 	
-	//Initialize Camera Settings
-	camera_ok = camera->initializeCam();
+	camera_ok = camera->initializeCam();  	//Initialize the camera
 
 	if (camera_ok) {
 
-		std::cout<<"Image Dimensions: " << camera->width <<"x"<< camera->height<<std::endl;
 		std::cout << "Start camera acquisition in " << start_delay << " seconds" << std::endl;
 		std::this_thread::sleep_for(std::chrono::seconds(start_delay));	
 

@@ -14,5 +14,4 @@ class Uavcam {
 		virtual void trigger() = 0;
 		virtual bool getImage(cv::Mat &frame) = 0;
 
-		int width, height;
 };

@@ -7,11 +7,13 @@ WebCam::WebCam(){}
 WebCam::~WebCam(){}	
 	
 bool WebCam::initializeCam(){
+	int w,h;
+
 	cam.open(0);
 	if(cam.isOpened()){
-		std::cout<<"Webcam successfully opened"<<std::endl;
-		this->width = (int) cam.get(CV_CAP_PROP_FRAME_WIDTH);
-		this->height = (int) cam.get(CV_CAP_PROP_FRAME_HEIGHT);
+		w = (int) cam.get(CV_CAP_PROP_FRAME_WIDTH);
+		h = (int) cam.get(CV_CAP_PROP_FRAME_HEIGHT);
+		std::cout<<"Webcam opened at "<<w<<"x"<<h<<std::endl;
 		return true;
 	}
 	else
