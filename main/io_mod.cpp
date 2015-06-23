@@ -3,6 +3,7 @@
 bool parseConfig(){
 	std::ifstream cfgstream(CONFIG_FILE, std::ifstream::in);
 	std::string param, num;
+	int tmp;
 	bool cfg_ok = false;
 	if(!cfgstream) return cfg_ok;
 
@@ -24,12 +25,8 @@ bool parseConfig(){
 		}
 		if(param.compare("sizefactor")==0){
 			std::getline(cfgstream,num);
-			sizefac = std::stoi(num);
-			continue;
-		}
-		if(param.compare("jpgq")==0){
-			std::getline(cfgstream,num);
-			jpgq  = std::stoi(num);
+			tmp = std::stoi(num);
+			sizefac = double(1/double(tmp));
 			continue;
 		}
 		if(param.compare("viewer")==0){
@@ -42,9 +39,9 @@ bool parseConfig(){
 			start_delay = std::stoi(num);
 			continue;
 		}
-		if(param.compare("imgstrm")==0){
+		if(param.compare("stream")==0){
 			std::getline(cfgstream,num);
-			imgstrm = std::stoi(num);
+			strm = std::stoi(num);
 			continue;
 		}
 	}
@@ -72,5 +69,4 @@ int checkLogInit(){
 	    }
 	return saved;
 }
-
 

@@ -171,30 +171,6 @@ araviscamera.cpp.s:
 	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.s
 .PHONY : araviscamera.cpp.s
 
-fakecamera.o: fakecamera.cpp.o
-.PHONY : fakecamera.o
-
-# target to build an object file
-fakecamera.cpp.o:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/fakecamera.cpp.o
-.PHONY : fakecamera.cpp.o
-
-fakecamera.i: fakecamera.cpp.i
-.PHONY : fakecamera.i
-
-# target to preprocess a source file
-fakecamera.cpp.i:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/fakecamera.cpp.i
-.PHONY : fakecamera.cpp.i
-
-fakecamera.s: fakecamera.cpp.s
-.PHONY : fakecamera.s
-
-# target to generate assembly for a file
-fakecamera.cpp.s:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/fakecamera.cpp.s
-.PHONY : fakecamera.cpp.s
-
 webcamera.o: webcamera.cpp.o
 .PHONY : webcamera.o
 
@@ -234,9 +210,6 @@ help:
 	@echo "... araviscamera.o"
 	@echo "... araviscamera.i"
 	@echo "... araviscamera.s"
-	@echo "... fakecamera.o"
-	@echo "... fakecamera.i"
-	@echo "... fakecamera.s"
 	@echo "... webcamera.o"
 	@echo "... webcamera.i"
 	@echo "... webcamera.s"

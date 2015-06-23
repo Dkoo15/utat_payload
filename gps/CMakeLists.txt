@@ -1,1 +1,1 @@
-add_library(gpsmodule gpsmod.cpp)
+add_library(gpsmodule gps_mod.cpp)

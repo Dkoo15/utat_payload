@@ -3,22 +3,22 @@
 #include <thread>
 #include <chrono>
 #include <mutex>
-#include <condition_variable>
 #include <iomanip>
+#include <opencv2/opencv.hpp>
 
 //Project header files
 #include "araviscamera.h" 
-#include "fakecamera.h"
 #include "webcamera.h"
-#include "imgproc.h"
-#include "gpsmod.h"
+#include "gps_mod.h"
 #include "io_mod.h"
 
-#define PREFIX "Pictures/"
+#define FOLDER "Pictures/"
 
 volatile std::sig_atomic_t finish = 0; //Signal Variable
 std::mutex mtx;
-int cameratype, usegps, saveimg, view, sizefac, jpgq, bufferq, timeout, start_delay, imgstrm; //Options
+Gps *ublox;
+int cameratype, usegps, saveimg, view, start_delay, strm; //Options
+double sizefac;
 
 void exit_signal(int param){
 	mtx.lock();
@@ -27,12 +27,12 @@ void exit_signal(int param){
 	mtx.unlock();
 }
 
-void gpsPoll(){
+void gpsUpdate(){
 	while(!finish){
 		if (usegps)
-			gps::readGPS();
+			ublox->readGPS();
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(150));
 	}
 	std::cout<<"GPS Thread joining..."<<std::endl;
 }
@@ -41,44 +41,44 @@ void writeLine(std::ofstream &logstream, std::string image){
 	mtx.lock();
 	logstream<< image  <<",";
 	logstream.precision(9);
-	logstream<< gps::current_loc.latitude <<",";
-	logstream<< gps::current_loc.longitude<<",";
+	logstream<< ublox->current_loc.latitude <<",";
+	logstream<< ublox->current_loc.longitude<<",";
 	logstream.precision(2);
-	logstream<< gps::current_loc.altitude <<",";
-	logstream<< gps::current_loc.heading << ",";
-	logstream<< gps::current_loc.tbuf;
+	logstream<< ublox->current_loc.altitude <<",";
+	logstream<< ublox->current_loc.heading << ",";
+	logstream<< ublox->current_loc.tbuf;
 	logstream<< std::endl;
 	mtx.unlock();
 }
 
 int main(){
 	Uavcam *camera; 
-	std::vector<unsigned char> rawbuf;
-	std::vector<unsigned char> jpgbuffer;
- 	bool camera_ok, buffer_ok, gps_ok;
+ 	bool camera_ok, frame_ok;
 	int n_saved;
-	int width, height;
+
 	std::ofstream gpstream;
 	std::stringstream filename;
-	std::stringstream directory1;
-	std::stringstream directory2;
+	std::stringstream directory;
+	std::vector<int> jpg_params;
 
-	WebCam *webcamera;
+	cv::Mat frame, preview;
 
 	parseConfig();
+	jpg_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+	jpg_params.push_back(90);
 
-	
 	//Set Signals
 	std::signal(SIGINT,exit_signal); 	//Set up Ctrl+C signal
 
 	//Construct Classes
-	if (cameratype == 0)	
-		camera = new Imgfromfile();
-	else if (cameratype == 1)
+	if (cameratype == 1)
 		camera = new AravisCam();
+	else //(cameratype ==2)
+		camera = new WebCam();
 	
-	webcamera = new WebCam();
-
+	if(view)	
+		cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);
+	
 	//Check log and start numbering
 	n_saved = checkLogInit();
 	gpstream.open("Pictures/uav_gps.log",std::ofstream::app);
@@ -89,72 +89,58 @@ int main(){
 	}
 
 	//Initialize GPS
- 	if((gps_ok = gps::startGPS())) 	
-		std::cout<<"GPS is working! Check Lock"<<std::endl;
-	else		
-		std::cout<<"GPS Error, no georeferencing"<<std::endl;
-
-	std::thread gps_poll_thread(gpsPoll);
+	if(usegps)
+		ublox = new Gps();	
+	std::thread gps_thread(gpsUpdate);
 	
 	//Initialize Camera Settings
-	camera_ok = camera->initCamSetting(width, height);
+	camera_ok = camera->initializeCam();
+
 	if (camera_ok) {
-		std::cout<<"Width = " << width << " Height = " << height << " Payload = "<< camera->payload<<std::endl;
-		rawbuf.resize(camera->payload);
-		uavision::initialize(width, height, view, jpgq);
-	}
-	webcamera->openWebcam();
 
-	std::cout << "Start camera acquisition in " << start_delay << " seconds" << std::endl;
-	std::this_thread::sleep_for(std::chrono::seconds(start_delay));	
+		std::cout<<"Width = " << camera->width << " Height = " << camera->height<<std::endl;
+		std::cout << "Start camera acquisition in " << start_delay << " seconds" << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(start_delay));	
 
-	if (camera_ok) camera->startCam();
+		while(!finish){  //--Main Acquisition Loop
 
-	while(!finish){  //--Main Acquisition Loop
-		filename.str("");
-		directory1.str("");
-		directory2.str("");
-		filename<<"im"<<std::setfill('0')<<std::setw(4)<<++n_saved;
-		filename<<".jpg";
-		directory1<<PREFIX<<filename.str();
-		directory2<<PREFIX<<"webcam/"<<filename.str();
-
-		if(camera_ok){
-			camera->sendTrigger();
-			buffer_ok = camera->getBuffer(rawbuf);
-
-			if(buffer_ok){ //Acquired Image
-
-				if(cameratype <= 1)
-					uavision::processRaw(rawbuf);
-				else 
-					uavision::assignData(rawbuf);
-				
-				if(imgstrm)  uavision::compressPreview(jpgbuffer);
-					
-				if(saveimg)  uavision::saveFullImage(directory1.str());
-
-				if(view){
-					uavision::createPreview(sizefac);
-					uavision::openViewer();
-				}
-			}
+			filename.str(""); directory.str(""); //Update filenames
+			filename<<"im"<<std::setfill('0')<<std::setw(4)<<++n_saved<<".jpg";
+			directory<<FOLDER<<filename.str();
 		
+			camera->trigger(); //Send camera trigger
+
+			writeLine(gpstream, filename.str()); //Record GPS
+
+			frame_ok = camera->getImage(frame); //Acquire the image
+
+			if(frame_ok){ //Acquired Image
+
+				cv::resize(frame,preview,cv::Size(),sizefac,sizefac,cv::INTER_NEAREST);
+
+				if(saveimg) {
+					cv::imwrite(directory.str(), preview, jpg_params);
+					std::cout<<"Saved to " << filename.str() <<std::endl;
+				}
+
+				if(view) {
+					cv::imshow("Camera Viewer", preview); 
+					cv::waitKey(500);	
+				}	
+			}
+			
+			if(ublox->data_is_good)	
+				std::cout<<"GPS up to date"<<std::endl;
+			else	
+				std::cout<<"No GPS available" <<std::endl;
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		writeLine(gpstream, filename.str());
-		webcamera->saveFrame(directory2.str());
-	
-		if(gps::data_is_good)	std::cout<<"GPS up to date"<<std::endl;
-		else	std::cout<<"No GPS available" <<std::endl;
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
 	}
-	if(camera_ok) camera->endCam();
-
-	gps_poll_thread.join();
-	gpstream.close();
 
 	delete camera;
+	gps_thread.join();
+	gpstream.close();
+
 	return 0;
 }

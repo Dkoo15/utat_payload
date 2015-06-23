@@ -4,22 +4,19 @@ WebCam::WebCam(){}
 
 WebCam::~WebCam(){}	
 	
-bool WebCam::initCamSetting(int &width, int &height){
-	bool cam_ok = openWebcam();
+bool WebCam::initializeCam(){
+	bool cam_ok = cam.open(0);
 	if(cam_ok){
-		width = (int) cam.get(CV_CAP_PROP_FRAME_WIDTH);
-		height = (int) cam.get(CV_CAP_PROP_FRAME_HEIGHT);
-		payload = width*height*3;
+		std::cout<<"Webcam successfully opened"<<std::endl;
+		this->width = (int) cam.get(CV_CAP_PROP_FRAME_WIDTH);
+		this->height = (int) cam.get(CV_CAP_PROP_FRAME_HEIGHT);
 	}
 
 	return cam_ok;
 }
 
-void WebCam::startCam(){
-	std::cout<<"Using first available webcam..."<<std::endl;
-}
-
-void WebCam::sendTrigger(){
+void WebCam::trigger(){
+	//Instead of clearing the sending a trigger, we're just going to clear the buffer
 	bool grab;
 	for (int i = 0; i < 10; i++)
 		grab = cam.grab();
@@ -30,35 +27,8 @@ void WebCam::sendTrigger(){
 		std::cout<<"Error acquiring webcam picutre" << std::endl;
 }
 
-bool WebCam::getBuffer(std::vector<unsigned char> &buffer){
+bool WebCam::getImage(cv::Mat &frame){
 	cam.retrieve(frame);
-	if(frame.empty()){
-		std::cout<<"Error getting frame " << std::endl;
-		return false;
-	}
-	memcpy(&buffer[0],frame.data,payload);
-	return true;
+	return (!frame.empty());
 }
 
-void WebCam::endCam(){}
-
-bool WebCam::openWebcam(){
-	jpg_params.push_back(CV_IMWRITE_JPEG_QUALITY);
-	jpg_params.push_back(90);
-	bool status = cam.open(0);
-	if(status)
-		std::cout<<"Webcam initialized"<<std::endl;
-	else 
-		std::cout<<"Error initializing webcam" <<std::endl;
-	
-	return status;
-}
-void WebCam::saveFrame(std::string filename){
-	for (int i = 0; i < 10; i++)
-		cam.grab();
-
-	cam.retrieve(frame);
-	if(!frame.empty()){
-		cv::imwrite(filename,frame,jpg_params);
-	}
-}

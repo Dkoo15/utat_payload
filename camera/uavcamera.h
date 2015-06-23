@@ -1,5 +1,8 @@
 #pragma once
+#include <opencv2/opencv.hpp>
+
 #include <vector>
+#include <iostream>
 
 class Uavcam {
 
@@ -7,12 +10,9 @@ class Uavcam {
 		Uavcam(){}
 		virtual ~Uavcam(){}
 		
-		virtual bool initCamSetting(int &width, int &height) = 0;
-		virtual void startCam() = 0;
-		virtual void sendTrigger() = 0;
-		virtual bool getBuffer(std::vector<unsigned char> &buffer) = 0;
-		virtual void endCam() = 0;
+		virtual bool initializeCam() = 0;
+		virtual void trigger() = 0;
+		virtual bool getImage(cv::Mat &frame) = 0;
 
-		int payload;
-
+		int width, height;
 };
