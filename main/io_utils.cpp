@@ -1,4 +1,6 @@
-#include "io_mod.h"
+#include "io_utils.h"
+
+std::ofstream gps_log;
 
 bool parseConfig(){
 	std::ifstream cfgstream(CONFIG_FILE, std::ifstream::in);
@@ -51,9 +53,9 @@ bool parseConfig(){
 	return cfg_ok;
 }
 
-int checkLogInit(){
+int checkLog(){
 	int saved = 0;
-	std::ifstream logstream ("Pictures/uav_gps.log", std::ifstream::in);
+	std::ifstream logstream (LOG_FILE, std::ifstream::in);
 	
 	if(!logstream){
 		std::cout << "Starting from scratch" << std::endl;
@@ -70,3 +72,24 @@ int checkLogInit(){
 	return saved;
 }
 
+void openLogtoWrite(int n_saved){
+	gps_log.open(LOG_FILE,std::ofstream::app);
+	gps_log<< std::fixed;
+
+	if (n_saved == -1)
+		gps_log <<"Image,Latitude[deg],Longitude[deg],Altitude[m],Heading[deg],Time" << std::endl;
+	
+}
+
+void writeImageInfo(struct position latest_gps, std::string image){
+	gps_log<< image  <<",";
+	gps_log.precision(9);
+	gps_log<< latest_gps.latitude <<","<< latest_gps.longitude<<",";
+	gps_log.precision(2);
+	gps_log<< latest_gps.altitude <<","<< latest_gps.heading << ",";
+	gps_log<< latest_gps.time<<std::endl;
+}
+
+void closeLog(){
+	gps_log.close();
+}

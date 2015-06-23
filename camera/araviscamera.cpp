@@ -1,10 +1,14 @@
 #include "araviscamera.h"
 #include <cstring>
 
+#define TIMEOUT 3
+#define BUFFERQ 5
+
 AravisCam::AravisCam(){}
 
 AravisCam:: ~AravisCam(){
 	endCam();
+	delete rawbuffer;
 }
 
 bool AravisCam::initializeCam(){

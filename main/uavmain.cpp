@@ -3,14 +3,17 @@
 #include <thread>
 #include <chrono>
 #include <mutex>
+#include <sstream>
 #include <iomanip>
+
+//Opencv
 #include <opencv2/opencv.hpp>
 
 //Project header files
 #include "araviscamera.h" 
 #include "webcamera.h"
 #include "gps_mod.h"
-#include "io_mod.h"
+#include "io_utils.h"
 
 #define FOLDER "Pictures/"
 
@@ -37,30 +40,15 @@ void gpsUpdate(){
 	std::cout<<"GPS Thread joining..."<<std::endl;
 }
 
-void writeLine(std::ofstream &logstream, std::string image){
-	mtx.lock();
-	logstream<< image  <<",";
-	logstream.precision(9);
-	logstream<< ublox->current_loc.latitude <<",";
-	logstream<< ublox->current_loc.longitude<<",";
-	logstream.precision(2);
-	logstream<< ublox->current_loc.altitude <<",";
-	logstream<< ublox->current_loc.heading << ",";
-	logstream<< ublox->current_loc.tbuf;
-	logstream<< std::endl;
-	mtx.unlock();
-}
-
 int main(){
 	Uavcam *camera; 
  	bool camera_ok, frame_ok;
 	int n_saved;
-
-	std::ofstream gpstream;
+	
 	std::stringstream filename;
 	std::stringstream directory;
-	std::vector<int> jpg_params;
 
+	std::vector<int> jpg_params;
 	cv::Mat frame, preview;
 
 	parseConfig();
@@ -70,7 +58,7 @@ int main(){
 	//Set Signals
 	std::signal(SIGINT,exit_signal); 	//Set up Ctrl+C signal
 
-	//Construct Classes
+	//Construct Cameras
 	if (cameratype == 1)
 		camera = new AravisCam();
 	else //(cameratype ==2)
@@ -79,18 +67,12 @@ int main(){
 	if(view)	
 		cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);
 	
-	//Check log and start numbering
-	n_saved = checkLogInit();
-	gpstream.open("Pictures/uav_gps.log",std::ofstream::app);
-	gpstream<< std::fixed;
-		if (n_saved == -1){
-		gpstream <<"Image,Latitude[deg],Longitude[deg],Altitude[m],Heading[deg]" << std::endl;
-		n_saved++;
-	}
+	//Check log and open
+	n_saved = checkLog();
+	openLogtoWrite(n_saved);
 
 	//Initialize GPS
-	if(usegps)
-		ublox = new Gps();	
+	ublox = new Gps();	
 	std::thread gps_thread(gpsUpdate);
 	
 	//Initialize Camera Settings
@@ -98,7 +80,7 @@ int main(){
 
 	if (camera_ok) {
 
-		std::cout<<"Width = " << camera->width << " Height = " << camera->height<<std::endl;
+		std::cout<<"Image Dimensions: " << camera->width <<"x"<< camera->height<<std::endl;
 		std::cout << "Start camera acquisition in " << start_delay << " seconds" << std::endl;
 		std::this_thread::sleep_for(std::chrono::seconds(start_delay));	
 
@@ -110,7 +92,15 @@ int main(){
 		
 			camera->trigger(); //Send camera trigger
 
-			writeLine(gpstream, filename.str()); //Record GPS
+			if (usegps){
+				if(ublox->data_is_good)	
+					std::cout<<"GPS up to date"<<std::endl;
+				else	
+					std::cout<<"No GPS available" <<std::endl;
+			}
+//			mtx.lock();
+//			writeImageInfo(ublox->current_loc, filename.str()); //Record GPS 
+//			mtx.unlock();
 
 			frame_ok = camera->getImage(frame); //Acquire the image
 
@@ -129,18 +119,13 @@ int main(){
 				}	
 			}
 			
-			if(ublox->data_is_good)	
-				std::cout<<"GPS up to date"<<std::endl;
-			else	
-				std::cout<<"No GPS available" <<std::endl;
-
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
 	}
 
 	delete camera;
 	gps_thread.join();
-	gpstream.close();
+	closeLog();
 
 	return 0;
 }

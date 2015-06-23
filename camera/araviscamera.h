@@ -3,8 +3,6 @@
 extern "C"{
 #include <arv.h>
 }
-#define TIMEOUT 3
-#define BUFFERQ 5
 
 class AravisCam: public Uavcam {
 

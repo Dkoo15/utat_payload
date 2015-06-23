@@ -1,15 +1,10 @@
-#include "libgpsmm.h"
 #include <iostream>
 #include <mutex>
 
+#include "libgpsmm.h"
+#include "gps_struct.h"
+
 #define GPS_WAIT_US 2000000
-
-
-struct position{
-	double latitude, longitude;
-	double altitude, heading;
-	char tbuf[200];
-};	
 
 class Gps{
 
