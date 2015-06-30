@@ -10,10 +10,13 @@
 #include <opencv2/opencv.hpp>
 
 //Project header files
-#include "araviscamera.h" 
 #include "webcamera.h"
 #include "gps_mod.h"
 #include "io_utils.h"
+#include "config.h"
+#ifdef USE_ARAVIS
+#include "araviscamera.h" 
+#endif
 
 #define FOLDER "Pictures/"
 
@@ -59,8 +62,14 @@ int main(){
 	std::signal(SIGINT,exit_signal); 	//Set up Ctrl+C signal
 
 	//Construct Cameras
-	if (cameratype == 1)
+	if (cameratype == 1){
+#ifdef USE_ARAVIS
 		camera = new AravisCam();
+		std::cout<<"Using Aravis camera"<<std::endl;
+#else
+		camera = new WebCam();
+#endif
+	}
 	else
 		camera = new WebCam();
 	
@@ -94,9 +103,9 @@ int main(){
 				else	
 					std::cout<<"No GPS available" <<std::endl;
 			}
-//			mtx.lock();
-//			writeImageInfo(ublox->current_loc, filename.str()); //Record GPS 
-//			mtx.unlock();
+			mtx.lock();
+			writeImageInfo(ublox->current_loc, filename.str()); //Record GPS 
+			mtx.unlock();
 
 			frame_ok = camera->getImage(frame); //Acquire the image
 
@@ -111,15 +120,16 @@ int main(){
 
 				if(view) {
 					cv::imshow("Camera Viewer", preview); 
-					cv::waitKey(500);	
+					cv::waitKey(50);
 				}	
 			}
 			
-			std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		}
+			std::this_thread::sleep_for(std::chrono::milliseconds(250));
+		} 
+		//Finished photographing
+		delete camera;
 	}
 
-	delete camera;
 	gps_thread.join();
 	closeLog();
 

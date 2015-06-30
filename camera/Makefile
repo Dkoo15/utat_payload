@@ -50,20 +50,10 @@ CMAKE_BINARY_DIR = /Users/davidkoo/uav/utat_payload
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/local/Cellar/cmake/3.2.3/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: install/strip
-.PHONY : install/strip/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/local/Cellar/cmake/3.0.2/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/local/Cellar/cmake/3.2.3/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -156,30 +146,6 @@ uavcam/fast:
 	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/build
 .PHONY : uavcam/fast
 
-araviscamera.o: araviscamera.cpp.o
-.PHONY : araviscamera.o
-
-# target to build an object file
-araviscamera.cpp.o:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.o
-.PHONY : araviscamera.cpp.o
-
-araviscamera.i: araviscamera.cpp.i
-.PHONY : araviscamera.i
-
-# target to preprocess a source file
-araviscamera.cpp.i:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.i
-.PHONY : araviscamera.cpp.i
-
-araviscamera.s: araviscamera.cpp.s
-.PHONY : araviscamera.s
-
-# target to generate assembly for a file
-araviscamera.cpp.s:
-	cd /Users/davidkoo/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.s
-.PHONY : araviscamera.cpp.s
-
 webcamera.o: webcamera.cpp.o
 .PHONY : webcamera.o
 
@@ -210,16 +176,12 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... install/strip"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... install"
 	@echo "... list_install_components"
 	@echo "... uavcam"
 	@echo "... install/local"
-	@echo "... araviscamera.o"
-	@echo "... araviscamera.i"
-	@echo "... araviscamera.s"
 	@echo "... webcamera.o"
 	@echo "... webcamera.i"
 	@echo "... webcamera.s"
