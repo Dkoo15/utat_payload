@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project("UTAT UAV")
 
 option(USE_ARAVIS "Use Aravis Library for GenieCam" OFF)
+option(USE_GPHOTO "Use Gphoto Library for DSLR" ON)
 
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules/")
@@ -23,6 +24,12 @@ if (USE_ARAVIS)
 	include_directories(${GOBJECT_INCLUDE_DIRS})
 	include_directories(${aravis_INCLUDE_DIR})
 endif(USE_ARAVIS)
+
+if (USE_GPHOTO)
+	message ("Using gphoto2")
+	FIND_PACKAGE(gphoto2 REQUIRED)
+	include_directories(${gphoto2_INCLUDE_DIR})
+endif(USE_GPHOTO)
 
 add_subdirectory(main)
 add_subdirectory(camera)
