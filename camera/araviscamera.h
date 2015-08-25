@@ -1,11 +1,8 @@
+#include "uavcamera.h"
+
 extern "C"{
 #include <arv.h>
 }
-
-#include "uavcamera.h"
-#include <iostream>
-#include <fstream>
-#include <string>
 
 class AravisCam: public Uavcam {
 
@@ -13,16 +10,24 @@ class AravisCam: public Uavcam {
 		AravisCam();
 		~AravisCam();	
 		
-		bool initCamSetting(int &width, int &height);
-		void startCam();
-		void sendTrigger();
-		bool getBuffer(std::vector<unsigned char> &buffer);
-		void endCam();
+		bool initializeCam();
+		void trigger();
+		bool getImage(cv::Mat &frame);
 
 	private:
+		void endCam();
+		void startCam();
+		bool getBuffer();
+
 		ArvGc *genicam;
 		ArvDevice *device;
 		ArvStream *stream;
-		ArvGcNode *trigger;
-		int timeout, bufferq;
+		ArvGcNode *triggernode;
+
+		cv::Mat rawmat;
+		cv::Size size;
+
+		int payload;
+		bool acquisition;
+		unsigned char* rawbuffer;
 };

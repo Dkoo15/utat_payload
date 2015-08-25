@@ -147,54 +147,6 @@ uavcam/fast:
 	cd /home/odroid/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/build
 .PHONY : uavcam/fast
 
-araviscamera.o: araviscamera.cpp.o
-.PHONY : araviscamera.o
-
-# target to build an object file
-araviscamera.cpp.o:
-	cd /home/odroid/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.o
-.PHONY : araviscamera.cpp.o
-
-araviscamera.i: araviscamera.cpp.i
-.PHONY : araviscamera.i
-
-# target to preprocess a source file
-araviscamera.cpp.i:
-	cd /home/odroid/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.i
-.PHONY : araviscamera.cpp.i
-
-araviscamera.s: araviscamera.cpp.s
-.PHONY : araviscamera.s
-
-# target to generate assembly for a file
-araviscamera.cpp.s:
-	cd /home/odroid/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.s
-.PHONY : araviscamera.cpp.s
-
-fakecamera.o: fakecamera.cpp.o
-.PHONY : fakecamera.o
-
-# target to build an object file
-fakecamera.cpp.o:
-	cd /home/odroid/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/fakecamera.cpp.o
-.PHONY : fakecamera.cpp.o
-
-fakecamera.i: fakecamera.cpp.i
-.PHONY : fakecamera.i
-
-# target to preprocess a source file
-fakecamera.cpp.i:
-	cd /home/odroid/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/fakecamera.cpp.i
-.PHONY : fakecamera.cpp.i
-
-fakecamera.s: fakecamera.cpp.s
-.PHONY : fakecamera.s
-
-# target to generate assembly for a file
-fakecamera.cpp.s:
-	cd /home/odroid/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/fakecamera.cpp.s
-.PHONY : fakecamera.cpp.s
-
 webcamera.o: webcamera.cpp.o
 .PHONY : webcamera.o
 
@@ -231,12 +183,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... uavcam"
-	@echo "... araviscamera.o"
-	@echo "... araviscamera.i"
-	@echo "... araviscamera.s"
-	@echo "... fakecamera.o"
-	@echo "... fakecamera.i"
-	@echo "... fakecamera.s"
 	@echo "... webcamera.o"
 	@echo "... webcamera.i"
 	@echo "... webcamera.s"
