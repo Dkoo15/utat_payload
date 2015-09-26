@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project("UTAT UAV")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-option(USE_ARAVIS "Use Aravis Library for GenieCam" OFF)
+option(USE_ARAVIS "Use Aravis Library for GenieCam" ON)
 option(USE_GPHOTO "Use Gphoto Library for DSLR" OFF)
 option(USE_GST "Use Gstreamer for webcam stream" OFF)
 

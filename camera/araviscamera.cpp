@@ -77,7 +77,7 @@ bool AravisCam::getBuffer(){
 		g_usleep (50000);
 		cycles++;
 		//do  {
-		for (int i = 0; i < bufferq; i++){
+		for (int i = 0; i < BUFFERQ; i++){
 			arvbufr = arv_stream_try_pop_buffer (stream);
 			if (arvbufr != NULL){
 				switch(arvbufr->status){
@@ -93,9 +93,9 @@ bool AravisCam::getBuffer(){
 			}		 
 		}
 		//} while (arvbufr != NULL);// && !snapped);
-	}while(cycles < timeout && !snapped);
+	}while(cycles < TIMEOUT && !gotbuf);
 
-	return snapped;
+	return gotbuf;
 }
 
 void  AravisCam::startCam(){

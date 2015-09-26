@@ -147,6 +147,30 @@ uavcam/fast:
 	cd /home/odroid/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/build
 .PHONY : uavcam/fast
 
+araviscamera.o: araviscamera.cpp.o
+.PHONY : araviscamera.o
+
+# target to build an object file
+araviscamera.cpp.o:
+	cd /home/odroid/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.o
+.PHONY : araviscamera.cpp.o
+
+araviscamera.i: araviscamera.cpp.i
+.PHONY : araviscamera.i
+
+# target to preprocess a source file
+araviscamera.cpp.i:
+	cd /home/odroid/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.i
+.PHONY : araviscamera.cpp.i
+
+araviscamera.s: araviscamera.cpp.s
+.PHONY : araviscamera.s
+
+# target to generate assembly for a file
+araviscamera.cpp.s:
+	cd /home/odroid/uav/utat_payload && $(MAKE) -f camera/CMakeFiles/uavcam.dir/build.make camera/CMakeFiles/uavcam.dir/araviscamera.cpp.s
+.PHONY : araviscamera.cpp.s
+
 webcamera.o: webcamera.cpp.o
 .PHONY : webcamera.o
 
@@ -183,6 +207,9 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... uavcam"
+	@echo "... araviscamera.o"
+	@echo "... araviscamera.i"
+	@echo "... araviscamera.s"
 	@echo "... webcamera.o"
 	@echo "... webcamera.i"
 	@echo "... webcamera.s"
