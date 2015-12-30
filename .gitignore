@@ -11,6 +11,7 @@ camera/CMakeFiles/
 camera/stockbuffers/
 imgproc/CMakeFiles/
 main/Makefile
+camera/Makefile
 main/CmakeFiles/
 Cmakefiles/
 install_manifest.txt

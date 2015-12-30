@@ -70,8 +70,6 @@ int main(){
 		camera = new WebCam();
 #endif
 	}
-	else
-		camera = new WebCam();
 	
 	if(view)	
 		cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);

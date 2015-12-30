@@ -1,2 +1,1 @@
-arv-tool-0.4 control GevSCPSPacketSize=1500 ExposureAuto=Continuous ExposureMode=Timed ExposureTime=500 GainAuto=Continuous exposureAlignment=Reset autoBrightnessMode=Continuous TriggerMode=On TriggerSource=Software AcquisitionMode=Continuous
-#arv-tool-0.4 control GevSCPSPacketSize=1500 ExposureAuto=Off ExposureMode=Timed ExposureTime=1000 GainAuto=Continuous exposureAlignment=Reset autoBrightnessMode=Off TriggerMode=On TriggerSource=Software AcquisitionMode=Continuous PixelFormat=BayerGB8
+arv-tool-0.4 control GevSCPSPacketSize=1500 ExposureAuto=Off ExposureMode=Timed ExposureTime=500 GainAuto=Continuous exposureAlignment=Reset autoBrightnessMode=Off TriggerMode=On TriggerSource=Software AcquisitionMode=Continuous 

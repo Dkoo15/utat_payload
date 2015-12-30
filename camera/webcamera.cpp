@@ -11,6 +11,9 @@ bool WebCam::initializeCam(){
 
 	cam.open(0);
 	if(cam.isOpened()){
+		cam.set(CV_CAP_PROP_FRAME_WIDTH,1280);
+		cam.set(CV_CAP_PROP_FRAME_HEIGHT,960);
+
 		w = (int) cam.get(CV_CAP_PROP_FRAME_WIDTH);
 		h = (int) cam.get(CV_CAP_PROP_FRAME_HEIGHT);
 		std::cout<<"Webcam opened at "<<w<<"x"<<h<<std::endl;
@@ -36,4 +39,3 @@ bool WebCam::getImage(cv::Mat &frame){
 	cam.retrieve(frame);
 	return (!frame.empty());
 }
-
