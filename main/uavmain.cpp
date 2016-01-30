@@ -6,6 +6,8 @@
 #include <sstream>
 #include <iomanip>
 
+//#include <sys/time.h>
+
 //Opencv
 #include <opencv2/opencv.hpp>
 
@@ -26,6 +28,8 @@ Gps *ublox;
 int cameratype, usegps, saveimg, view, start_delay, strm; //Options
 double sizefac;
 
+struct timespec start, end;
+
 void exit_signal(int param){
 	mtx.lock();
 	finish  = 1;
@@ -43,11 +47,15 @@ void gpsUpdate(){
 	std::cout<<"GPS Thread joining..."<<std::endl;
 }
 
+void printTimeDiff(struct &start, struct &end){
+	seconds = end
+}
+
 int main(){
 	Uavcam *camera; 
- 	bool camera_ok, frame_ok;
+	bool camera_ok, frame_ok;
 	int n_saved;
-	
+
 	std::stringstream filename;
 	std::stringstream directory;
 
@@ -70,17 +78,19 @@ int main(){
 		camera = new WebCam();
 #endif
 	}
-	
+
 	if(view)	
 		cv::namedWindow("Camera Viewer", cv::WINDOW_AUTOSIZE);
-	
+
 	n_saved = checkLog(); 			//Check the log and open it
 	openLogtoWrite(n_saved);
 
 	ublox = new Gps();			//Initialize the GPS
 	std::thread gps_thread(gpsUpdate);
-	
+
+	//clock_gettime(CLOCK_MONOTONIC, &start);
 	camera_ok = camera->initializeCam();  	//Initialize the camera
+	//clock_gettime(CLOCK_MONOTONIC, &end);
 
 	if (camera_ok) {
 
@@ -92,8 +102,8 @@ int main(){
 			filename.str(""); directory.str(""); //Update filenames
 			filename<<"im"<<std::setfill('0')<<std::setw(4)<<++n_saved<<".jpg";
 			directory<<FOLDER<<filename.str();
-		
-			camera->trigger(); //Send camera trigger
+
+			frame_ok = camera->trigger(frame); //Send camera trigger
 
 			if (usegps){
 				if(ublox->data_is_good)	
@@ -101,11 +111,12 @@ int main(){
 				else	
 					std::cout<<"No GPS available" <<std::endl;
 			}
+
 			mtx.lock();
 			writeImageInfo(ublox->current_loc, filename.str()); //Record GPS 
 			mtx.unlock();
 
-			frame_ok = camera->getImage(frame); //Acquire the image
+			//frame_ok = camera->getImage(frame); //Acquire the image
 
 			if(frame_ok){ //Acquired Image
 
@@ -121,14 +132,14 @@ int main(){
 					cv::waitKey(50);
 				}	
 			}
-			
+
 			std::this_thread::sleep_for(std::chrono::milliseconds(250));
 		} 
 		//Finished photographing
 		delete camera;
 	}
 
-	gps_thread.join();
+	gps_thread.join(); 
 	closeLog();
 
 	return 0;
