@@ -28,7 +28,7 @@ Gps *ublox;
 int cameratype, usegps, saveimg, view, start_delay, strm; //Options
 double sizefac;
 
-struct timespec start, end;
+//struct timespec start, end;
 
 void exit_signal(int param){
 	mtx.lock();
@@ -47,9 +47,9 @@ void gpsUpdate(){
 	std::cout<<"GPS Thread joining..."<<std::endl;
 }
 
-void printTimeDiff(struct &start, struct &end){
+/*void printTimeDiff(struct &start, struct &end){
 	seconds = end
-}
+}*/
 
 int main(){
 	Uavcam *camera; 
