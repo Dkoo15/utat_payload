@@ -17,3 +17,7 @@ if(USE_ARAVIS)
 	target_link_libraries(utxPayload ${GOBJECT_LIBRARIES})
 	target_link_libraries(utxPayload ${aravis_LIBRARY})
 endif(USE_ARAVIS)
+
+if(USE_GIMBAL)
+	target_link_libraries(utxPayload gimbal)
+endif(USE_GIMBAL)
