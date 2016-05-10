@@ -11,7 +11,7 @@ class AravisCam: public Uavcam {
 		~AravisCam();	
 		
 		bool initializeCam();
-		void trigger();
+		bool trigger(cv::Mat &frame);
 		bool getImage(cv::Mat &frame);
 
 	private:
@@ -23,6 +23,8 @@ class AravisCam: public Uavcam {
 		ArvDevice *device;
 		ArvStream *stream;
 		ArvGcNode *triggernode;
+		ArvGcNode *start;
+		ArvGcNode *end;
 
 		cv::Mat rawmat;
 		cv::Size size;

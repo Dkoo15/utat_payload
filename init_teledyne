@@ -1,1 +1,10 @@
-arv-tool-0.4 control GevSCPSPacketSize=1500 ExposureAuto=Off ExposureMode=Timed ExposureTime=500 GainAuto=Continuous exposureAlignment=Reset autoBrightnessMode=Off TriggerMode=On TriggerSource=Software AcquisitionMode=Continuous 
+arv-tool-0.4 control \
+GevSCPSPacketSize=1500 \
+ExposureAuto=Off \
+ExposureMode=Timed \
+ExposureTime=40500 \
+GainAuto=Continuous \
+exposureAlignment=Reset \
+autoBrightnessMode=Off \
+TriggerMode=Off \
+AcquisitionMode=SingleFrame

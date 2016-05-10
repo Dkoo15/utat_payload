@@ -11,7 +11,7 @@ class Uavcam {
 		virtual ~Uavcam(){}
 		
 		virtual bool initializeCam() = 0;
-		virtual void trigger() = 0;
+		virtual bool trigger(cv::Mat &frame) = 0;
 		virtual bool getImage(cv::Mat &frame) = 0;
 
 };

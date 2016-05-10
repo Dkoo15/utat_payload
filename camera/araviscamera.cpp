@@ -1,7 +1,7 @@
 #include "araviscamera.h"
 #include <cstring>
 
-#define TIMEOUT 3
+#define TIMEOUT 10
 #define BUFFERQ 5
 
 AravisCam::AravisCam(){}
@@ -43,6 +43,10 @@ bool AravisCam::initializeCam(){
 
 	std::cout<<"Image " << width << "x" << height << ", " << payload << " bytes " << std::endl;
 
+	// Setup start and end pointers
+	start = arv_gc_get_node(genicam, "AcquisitionStart");
+	end = arv_gc_get_node (genicam, "AcquisitionStop");
+
 	//Create Stream and fill buffer queue
 	stream = arv_device_create_stream (device, NULL, NULL);
 
@@ -54,17 +58,28 @@ bool AravisCam::initializeCam(){
 	size = cv::Size(width, height);
 
 	//Get and save the node that is the software trigger
-	triggernode = arv_gc_get_node(genicam,"TriggerSoftware");
+	//triggernode = arv_gc_get_node(genicam,"TriggerSoftware");
 
 	return true;
 }
 
-void AravisCam::trigger(){
-	if(acquisition == false)
+bool AravisCam::trigger(cv::Mat &frame){
+	bool image_ok = false;
+	if(acquisition == false) {
 		startCam();
+	}
+	else {
+		// Stop execution, grab image, start execution
+		arv_gc_command_execute (ARV_GC_COMMAND (end), NULL);
+		std::cout<< "Stopped Acq, grabbing image." << std::endl;
+		image_ok = getImage(frame);		
+		std::cout<< "Grabbed image, starting Acq." << std::endl;
+		arv_gc_command_execute( ARV_GC_COMMAND(start),NULL);
+	}
+	return image_ok;
 
-	arv_gc_command_execute(ARV_GC_COMMAND(triggernode),NULL);
-	std::cout<< "Sent software trigger" << std::endl;
+	//arv_gc_command_execute(ARV_GC_COMMAND(triggernode),NULL);
+	//std::cout<< "Sent software trigger" << std::endl;
 }
 
 bool AravisCam::getBuffer(){
@@ -74,11 +89,10 @@ bool AravisCam::getBuffer(){
 
 	std::cout<<"Getting Buffer...";
 	do {
-		g_usleep (50000);
+		//g_usleep (50000);
 		cycles++;
-		//do  {
-		for (int i = 0; i < BUFFERQ; i++){
-			arvbufr = arv_stream_try_pop_buffer (stream);
+		do  {
+			arvbufr = arv_stream_pop_buffer (stream);
 			if (arvbufr != NULL){
 				switch(arvbufr->status){
 					case ARV_BUFFER_STATUS_SUCCESS: std::cout<<"Success"<<std::endl; break;
@@ -91,15 +105,15 @@ bool AravisCam::getBuffer(){
 				}	 
 				arv_stream_push_buffer (stream, arvbufr);
 			}		 
-		}
-		//} while (arvbufr != NULL);// && !snapped);
-	}while(cycles < TIMEOUT && !gotbuf);
+		} while (arvbufr != NULL && !gotbuf);
+	} while(cycles < TIMEOUT && !gotbuf);
 
+	if(cycles==TIMEOUT)
+		std::cout<<"Null Buffers"<<std::endl;
 	return gotbuf;
 }
 
 void  AravisCam::startCam(){
-	ArvGcNode *start = arv_gc_get_node(genicam, "AcquisitionStart");
 	arv_gc_command_execute( ARV_GC_COMMAND(start),NULL);
 	std::cout<< "Beginning camera acquisition"<<std::endl;
 	acquisition = true;
@@ -107,7 +121,6 @@ void  AravisCam::startCam(){
 }
 
 void AravisCam::endCam(){
-	ArvGcNode *end;
 	guint64 n_processed_buffers, n_failures, n_underruns;
 
 	arv_stream_get_statistics (stream, &n_processed_buffers, &n_failures, &n_underruns);
@@ -115,7 +128,6 @@ void AravisCam::endCam(){
 	std::cout << "Failures\t  = " << (unsigned int) n_failures << "\n";
 	std::cout << "Underruns\t = " << (unsigned int) n_underruns << "\n";
 
-	end = arv_gc_get_node (genicam, "AcquisitionStop");
 	arv_gc_command_execute (ARV_GC_COMMAND (end), NULL);
 	std::cout << "Ended Camera Acquisition" << std::endl;
 	acquisition = false;
